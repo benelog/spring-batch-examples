@@ -13,6 +13,7 @@ public class TestDbConfig {
   @Bean
   public DataSource dataSource() {
     return new EmbeddedDatabaseBuilder()
+        .setName("log-test-db")
         .setType(EmbeddedDatabaseType.H2)
         .addScript("schema.sql")
         .build();
