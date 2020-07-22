@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 
 public class AccessLogCsvToDbTask implements CommandLineRunner {
-  private AccessLogCsvReader reader;
-  private AccessLogDbWriter writer;
-  private int chunkSize = 100;
+  private final AccessLogCsvReader reader;
+  private final AccessLogDbWriter writer;
+  private final int chunkSize;
   private final Logger log = LoggerFactory.getLogger(AccessLogCsvToDbTask.class);
 
   public AccessLogCsvToDbTask(AccessLogCsvReader reader, AccessLogDbWriter writer, int chunkSize) {

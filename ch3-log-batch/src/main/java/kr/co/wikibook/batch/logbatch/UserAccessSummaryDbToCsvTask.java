@@ -11,15 +11,17 @@ import org.springframework.boot.CommandLineRunner;
 public class UserAccessSummaryDbToCsvTask  implements CommandLineRunner {
   private final Logger log = LoggerFactory.getLogger(AccessLogCsvToDbTask.class);
 
-  private UserAccessSummaryDbReader reader;
-  private UserAccessSummaryCsvWriter writer;
-  private int chunkSize = 100;
+  private final UserAccessSummaryDbReader reader;
+  private final UserAccessSummaryCsvWriter writer;
+  private final int chunkSize;
 
   public UserAccessSummaryDbToCsvTask(
       UserAccessSummaryDbReader reader,
-      UserAccessSummaryCsvWriter writer) {
+      UserAccessSummaryCsvWriter writer,
+      int chunkSize) {
     this.reader = reader;
     this.writer = writer;
+    this.chunkSize = chunkSize;
   }
 
   void open() throws SQLException, IOException {
