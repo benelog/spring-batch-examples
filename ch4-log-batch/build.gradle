@@ -1,0 +1,50 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'kr.co.wikibook.batch'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "Hoxton.SR6")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.batch:spring-batch-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task h2(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.h2.tools.Console'
+
+    def props = new Properties()
+    file("src/main/resources/application.properties").withInputStream { props.load(it) }
+
+    args(
+        '-driver', props.get('spring.datasource.driver-class-name'),
+        '-url', props.get('spring.datasource.url'),
+        '-user', props.get('spring.datasource.username')
+    )
+}
