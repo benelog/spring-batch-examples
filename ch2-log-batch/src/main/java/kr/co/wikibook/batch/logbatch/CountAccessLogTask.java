@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CountAccessLogTask implements CommandLineRunner {
 
-  private final JdbcTemplate db;
+  private final JdbcTemplate jdbc;
 
   public CountAccessLogTask(DataSource dataSource) {
-    this.db = new JdbcTemplate(dataSource);
+    this.jdbc = new JdbcTemplate(dataSource);
   }
 
   @Override
   public void run(String... args) {
-    long count = db.queryForObject("SELECT COUNT(1) FROM access_log", Long.class);
+    long count = jdbc.queryForObject("SELECT COUNT(1) FROM access_log", Long.class);
     System.out.println("access_log 테이블의 건 수 : " + count);
   }
 }

@@ -11,15 +11,15 @@ public class CheckDiskSpaceTask implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    if (args.length == 0) {
+    if (args.length < 2) {
       return;
     }
     String directory = args[0];
-    int expectedUsablePercentage = Integer.parseInt(args[1]);
+    int minUsablePercentage = Integer.parseInt(args[1]);
     File file = new File(directory);
     int actualUsablePercentage = (int) (file.getUsableSpace() * 100 / file.getTotalSpace());
     logger.info("남은 용량 {}%", actualUsablePercentage);
-    if (actualUsablePercentage < expectedUsablePercentage) {
+    if (actualUsablePercentage < minUsablePercentage) {
       throw new IllegalStateException("디스크 용량이 기대치보다 작습니다 : " + actualUsablePercentage + "% 사용 가능");
     }
   }
