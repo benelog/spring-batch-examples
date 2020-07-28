@@ -8,7 +8,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
 public class TestDbConfig {
-
   @Bean
   public DataSource dataSource() {
     return new EmbeddedDatabaseBuilder()
@@ -19,7 +18,7 @@ public class TestDbConfig {
   }
 
   @Bean
-  public PlatformTransactionManager transactionManager() {
-    return new DataSourceTransactionManager(dataSource());
+  public PlatformTransactionManager transactionManager(DataSource dataSource) {
+    return new DataSourceTransactionManager(dataSource);
   }
 }

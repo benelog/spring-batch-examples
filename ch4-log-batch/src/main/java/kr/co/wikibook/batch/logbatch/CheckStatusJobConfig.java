@@ -16,10 +16,7 @@ public class CheckStatusJobConfig {
       DataSource dataSource
   ) {
     return jobFactory.get("checkStatusJob")
-        .start(stepFactory.get("helloStep")
-            .tasklet(new HelloTask())
-            .build()
-        ).next(stepFactory.get("checkDiskSpaceStep")
+        .start(stepFactory.get("checkDiskSpaceStep")
             .tasklet(new CheckDiskSpaceTask())
             .build()
         ).next(stepFactory.get("countAccessLogStep")
