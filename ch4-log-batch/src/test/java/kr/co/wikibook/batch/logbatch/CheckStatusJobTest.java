@@ -34,4 +34,12 @@ class CheckStatusJobTest {
     ExitStatus exitStatus = jobExec.getExitStatus();
     assertThat(exitStatus).isEqualTo(ExitStatus.COMPLETED);
   }
+
+  @Test
+  void launchCountAccessLogStep() throws Exception {
+    JobExecution jobExec = jobTester.launchStep("countAccessLogStep");
+
+    ExitStatus exitStatus = jobExec.getExitStatus();
+    assertThat(exitStatus).isEqualTo(ExitStatus.COMPLETED);
+  }
 }
