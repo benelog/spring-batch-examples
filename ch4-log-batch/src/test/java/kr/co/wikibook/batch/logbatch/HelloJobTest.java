@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest("spring.batch.job.names=" + CheckStatusJobConfig.JOB_NAME)
+@SpringBootTest("spring.batch.job.names=" + HelloJobConfig.JOB_NAME)
 @ActiveProfiles("test")
 @SpringBatchTest
-class CheckStatusJobTest {
+class HelloJobTest {
 
   @Autowired
   JobLauncherTestUtils jobTester;
@@ -24,8 +24,6 @@ class CheckStatusJobTest {
   @Test
   void launchJob() throws Exception {
     JobParameters jobParameters = new JobParametersBuilder()
-        .addString("directory", "/")
-        .addLong("minUsablePercentage", 5L)
         .addJobParameters(jobTester.getUniqueJobParameters())
         .toJobParameters();
 
