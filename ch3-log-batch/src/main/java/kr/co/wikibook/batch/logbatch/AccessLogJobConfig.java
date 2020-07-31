@@ -1,6 +1,7 @@
 package kr.co.wikibook.batch.logbatch;
 
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,11 +17,12 @@ import org.springframework.core.io.Resource;
 @ConditionalOnProperty(value = "job", havingValue = "accessLogJob")
 public class AccessLogJobConfig {
 
+  @Autowired
+  DataSource dataSource;
+
   @Bean
   @Order(1)
-  public CommandLineRunner accessLogCsvToDbTask(
-      @Value("${access-log}") Resource resource,
-      DataSource dataSource) {
+  public CommandLineRunner accessLogCsvToDbTask(@Value("${access-log}") Resource resource) {
     var reader = new AccessLogCsvReader(resource);
     var writer = new AccessLogDbWriter(dataSource);
     return new AccessLogCsvToDbTask(reader, writer, 300);
@@ -28,7 +30,7 @@ public class AccessLogJobConfig {
 
   @Bean
   @Order(2)
-  public CommandLineRunner userAccessSummaryDbToCsvTask(DataSource dataSource) {
+  public CommandLineRunner userAccessSummaryDbToCsvTask() {
     var reader = new UserAccessSummaryDbReader(dataSource);
     var writer = new UserAccessSummaryCsvWriter(new FileSystemResource("user-access-summary.csv"));
     return new UserAccessSummaryDbToCsvTask(reader, writer, 300);

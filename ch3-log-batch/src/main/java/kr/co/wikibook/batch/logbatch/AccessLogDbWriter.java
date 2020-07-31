@@ -4,8 +4,6 @@ import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 public class AccessLogDbWriter {
   private final String INSERT_STMT =
