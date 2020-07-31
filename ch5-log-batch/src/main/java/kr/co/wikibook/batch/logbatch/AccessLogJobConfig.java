@@ -5,8 +5,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.job.DefaultJobParametersValidator;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -21,25 +19,22 @@ import org.springframework.core.io.Resource;
 public class AccessLogJobConfig {
 
   public static final String JOB_NAME = "accessLogJob";
+  public static final Resource INJECTED_RESOURCED = null;
 
   @Bean
-  public Job accessLogJob(
-      JobBuilderFactory jobFactory,
-      StepBuilderFactory stepFactory,
+  public Job accessLogJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory,
       DataSource dataSource) {
 
-    var parametersValidator = new DefaultJobParametersValidator();
-    parametersValidator.setRequiredKeys(new String[]{"accessLog"});
+    AccessLogCsvReader csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
+    // Spring에 의해 주입되기 때문에 아무 값이나 넘겨도 됨.
 
     Resource userAccessOutput = new FileSystemResource("user-access-summary.csv");
 
     return jobFactory
         .get(JOB_NAME)
-        .validator(parametersValidator)
-        .incrementer(new RunIdIncrementer())
         .start(stepFactory.get("accessLogCsvToDb")
             .<AccessLog, AccessLog>chunk(300)
-            .reader(this.accessLogCsvReader(null)) // resource는 Spring에 의해 주입
+            .reader(csvReader) // resource는 Spring에 의해 주입
             .processor(new AccessLogProcessor())
             .writer(new AccessLogDbWriter(dataSource))
             .build())
