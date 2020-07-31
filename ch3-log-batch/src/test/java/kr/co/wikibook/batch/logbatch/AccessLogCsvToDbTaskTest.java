@@ -2,8 +2,6 @@ package kr.co.wikibook.batch.logbatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Instant;
-import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringJUnitConfig(classes = TestDbConfig.class)
+@SpringJUnitConfig(TestDbConfig.class)
 @Transactional
 class AccessLogCsvToDbTaskTest {
 

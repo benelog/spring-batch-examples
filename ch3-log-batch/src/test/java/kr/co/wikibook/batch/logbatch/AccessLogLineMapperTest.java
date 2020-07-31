@@ -3,7 +3,6 @@ package kr.co.wikibook.batch.logbatch;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.util.StringUtils;
 
 class AccessLogLineMapperTest {
   @Test
