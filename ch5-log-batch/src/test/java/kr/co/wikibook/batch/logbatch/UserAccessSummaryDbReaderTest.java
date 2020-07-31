@@ -26,11 +26,17 @@ class UserAccessSummaryDbReaderTest {
   DataSource dataSource;
 
   SimpleJdbcInsert insertStmt;
+  UserAccessSummaryDbReader reader;
 
   @BeforeEach
   void setUp() {
-    insertStmt = new SimpleJdbcInsert(dataSource);
-    insertStmt.withTableName("access_log");
+    this.insertStmt = new SimpleJdbcInsert(dataSource);
+    this.insertStmt.withTableName("access_log");
+    this.reader = new UserAccessSummaryDbReader(dataSource);
+  }
+
+  void tearDown() {
+    this.reader.close();
   }
 
   @Test
@@ -39,14 +45,12 @@ class UserAccessSummaryDbReaderTest {
     insert(Instant.now(), "127.0.0.1", "benelog");
     insert(Instant.now(), "192.168.0.1", "benelog");
     insert(Instant.now(), "127.0.0.1", "jojoldu");
-    var reader = new UserAccessSummaryDbReader(dataSource);
 
     // when
-    reader.open(new ExecutionContext());
-    UserAccessSummary item1 = reader.read();
-    UserAccessSummary item2 = reader.read();
-    UserAccessSummary item3 = reader.read();
-    reader.close();
+    this.reader.open(new ExecutionContext());
+    UserAccessSummary item1 = this.reader.read();
+    UserAccessSummary item2 = this.reader.read();
+    UserAccessSummary item3 = this.reader.read();
 
     // then
     assertThat(item1.getUsername()).isEqualTo("benelog");
