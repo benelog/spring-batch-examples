@@ -5,12 +5,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.lang.Nullable;
 
-public class UserAccessSummaryDbReader {
+public class UserAccessSummaryDbReader implements ItemStreamReader<UserAccessSummary> {
 
   private final String sql =
       "SELECT username, COUNT(1) AS access_count\n"
@@ -33,22 +36,33 @@ public class UserAccessSummaryDbReader {
     this.dataSource = dataSource;
   }
 
+  @Override
+  public void open(ExecutionContext executionContext) {
+    this.con = DataSourceUtils.getConnection(dataSource);
+    try {
+      this.stmt = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+      this.resultSet = stmt.executeQuery();
+    } catch (SQLException e) {
+      close();
+      throw new RuntimeException(e);
+    }
+  }
+
   @Nullable
   public UserAccessSummary read() throws SQLException {
-    if (this.resultSet.next()) {
+    if (resultSet.next()) {
       UserAccessSummary item = this.rowMapper.mapRow(resultSet, rowCount);
-      this.rowCount++;
+      rowCount++;
       return item;
     }
     return null;
   }
 
-  public void open() throws SQLException {
-    this.con = DataSourceUtils.getConnection(dataSource);
-    this.stmt = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-    this.resultSet = stmt.executeQuery();
+  @Override
+  public void update(ExecutionContext executionContext) throws ItemStreamException {
   }
 
+  @Override
   public void close() {
     this.rowCount = 0;
     JdbcUtils.closeResultSet(this.resultSet);
@@ -56,3 +70,4 @@ public class UserAccessSummaryDbReader {
     JdbcUtils.closeConnection(this.con);
   }
 }
+

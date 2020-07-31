@@ -10,9 +10,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+// java -Djob=accessLogJob -Daccess-log=file:./src/test/resources/sample-access-log.csv -jar build/libs/ch3-log-batch-0.0.1-SNAPSHOT.jar
+// ./gradlew bootRun -Djob=accessLogJob -Daccess-log=file:../access-log.csv
 @Configuration
 @ConditionalOnProperty(value = "job", havingValue = "accessLogJob")
 public class AccessLogJobConfig {
+
   @Bean
   @Order(1)
   public CommandLineRunner accessLogCsvToDbTask(

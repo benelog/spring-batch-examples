@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public abstract class ChunkTask<I> implements Tasklet {
+public abstract class SimpleChunkTask<I> implements Tasklet {
 
   protected int chunkSize = 100;
 
@@ -36,13 +34,11 @@ public abstract class ChunkTask<I> implements Tasklet {
     }
   }
 
-  @PostConstruct
   abstract void open() throws IOException, SQLException;
 
   abstract I read() throws SQLException;
 
   abstract void write(List<I> items) throws IOException;
 
-  @PreDestroy
   abstract void close() throws IOException;
 }

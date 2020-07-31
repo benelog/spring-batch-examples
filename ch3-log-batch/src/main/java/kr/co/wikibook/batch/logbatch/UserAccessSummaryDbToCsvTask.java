@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 
 public class UserAccessSummaryDbToCsvTask  implements CommandLineRunner {
-  private final Logger log = LoggerFactory.getLogger(AccessLogCsvToDbTask.class);
+  private final Logger log = LoggerFactory.getLogger(UserAccessSummaryDbToCsvTask.class);
 
   private final UserAccessSummaryDbReader reader;
   private final UserAccessSummaryCsvWriter writer;
@@ -32,7 +32,7 @@ public class UserAccessSummaryDbToCsvTask  implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
     int totalItems = 0;
-    this.reader.open();
+    this.open();
     List<UserAccessSummary> chunk = new LinkedList<>();
 
     while (true) {
@@ -52,9 +52,8 @@ public class UserAccessSummaryDbToCsvTask  implements CommandLineRunner {
         chunk.clear();
       }
     }
-
-    this.reader.close();
     log.info("{}개의 항목이 처리됨", totalItems);
+    this.close();
   }
 
   void close() throws IOException {

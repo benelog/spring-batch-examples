@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -21,10 +22,10 @@ class UserAccessSummaryCsvWriterTest {
         new UserAccessSummary("benelog", 32),
         new UserAccessSummary("jojoldu", 42)
     );
+    var writer = new UserAccessSummaryCsvWriter(resource);
 
     // when
-    var writer = new UserAccessSummaryCsvWriter(resource);
-    writer.open();
+    writer.open(new ExecutionContext());
     writer.write(items);
     writer.close();
 

@@ -9,12 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringJUnitConfig(classes = TestDbConfig.class)
+@Transactional
 class UserAccessSummaryDbReaderTest {
 
   Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -39,7 +42,7 @@ class UserAccessSummaryDbReaderTest {
     var reader = new UserAccessSummaryDbReader(dataSource);
 
     // when
-    reader.open();
+    reader.open(new ExecutionContext());
     UserAccessSummary item1 = reader.read();
     UserAccessSummary item2 = reader.read();
     UserAccessSummary item3 = reader.read();
