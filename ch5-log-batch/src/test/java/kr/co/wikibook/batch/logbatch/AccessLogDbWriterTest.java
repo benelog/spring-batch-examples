@@ -12,7 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringJUnitConfig(classes = TestDbConfig.class)
+@SpringJUnitConfig(TestDbConfig.class)
 @Transactional
 class AccessLogDbWriterTest {
 

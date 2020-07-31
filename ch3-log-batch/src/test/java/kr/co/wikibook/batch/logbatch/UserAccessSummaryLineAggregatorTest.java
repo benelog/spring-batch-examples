@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class UserAccessSummaryLineAggregatorTest {
   @Test
-  void aggregate() {
+  void aggregateLine() {
     // given
     var lineAggregator = new UserAccessSummaryLineAggregator();
     UserAccessSummary summary = new UserAccessSummary("benelog", 3);

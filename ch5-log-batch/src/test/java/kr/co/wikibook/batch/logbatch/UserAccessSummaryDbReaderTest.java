@@ -16,7 +16,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringJUnitConfig(classes = TestDbConfig.class)
+@SpringJUnitConfig(TestDbConfig.class)
 @Transactional
 class UserAccessSummaryDbReaderTest {
 
