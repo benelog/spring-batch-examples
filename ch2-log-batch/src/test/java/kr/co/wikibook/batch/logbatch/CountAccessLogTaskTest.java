@@ -9,7 +9,7 @@ class CountAccessLogTaskTest {
 
   @Test
   void countAccessLog() {
-    var dataSource = buildDataSource();
+    DataSource dataSource = buildDataSource();
     var task = new CountAccessLogTask(dataSource);
     task.run();
   }
