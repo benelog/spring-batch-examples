@@ -1,5 +1,6 @@
 package kr.co.wikibook.batch.logbatch;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Scanner;
@@ -16,7 +17,8 @@ public class AccessLogCsvReader implements Closeable {
   }
 
   public void open() throws IOException { // <4>
-    this.scanner = new Scanner(resource.getInputStream());
+    var inputStream = new BufferedInputStream(resource.getInputStream());
+    this.scanner = new Scanner(inputStream);
   }
 
   @Nullable // <5>
