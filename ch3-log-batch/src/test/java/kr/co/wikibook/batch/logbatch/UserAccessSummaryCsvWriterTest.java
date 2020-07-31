@@ -12,6 +12,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 class UserAccessSummaryCsvWriterTest {
+
   @Test
   void write(@TempDir Path tempPath) throws Exception {
     // given

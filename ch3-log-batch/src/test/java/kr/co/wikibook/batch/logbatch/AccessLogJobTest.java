@@ -14,6 +14,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
     "access-log=classpath:/sample-access-log.csv"
 })
 public class AccessLogJobTest {
+
   @Autowired
   DataSource dataSource;
 
