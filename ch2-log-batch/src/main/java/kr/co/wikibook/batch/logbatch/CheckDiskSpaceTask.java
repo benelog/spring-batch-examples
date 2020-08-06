@@ -18,7 +18,7 @@ public class CheckDiskSpaceTask implements CommandLineRunner {
     }
     String directory = args[0];
     int minUsablePercentage = Integer.parseInt(args[1]);
-    File file = new File(directory);
+    var file = new File(directory);
     int actualUsablePercentage = (int) (file.getUsableSpace() * 100 / file.getTotalSpace());
     logger.info("남은 용량 {}%", actualUsablePercentage);
     if (actualUsablePercentage < minUsablePercentage) {
