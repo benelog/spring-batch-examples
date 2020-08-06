@@ -8,7 +8,7 @@ class CheckDiskSpaceTaskTest {
 
   @Test
   void checkDiskSpace() {
-    CheckDiskSpaceTask task = new CheckDiskSpaceTask();
+    var task = new CheckDiskSpaceTask();
     assertThatThrownBy(() ->
         task.run("/", "100")
     ).isInstanceOf(IllegalStateException.class);

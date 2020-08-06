@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelloTask implements CommandLineRunner {
   @Override
-  public void run(String... args) {
+  public void run(String... args) throws Exception {
       System.out.println("Hello batch");
   }
 }
