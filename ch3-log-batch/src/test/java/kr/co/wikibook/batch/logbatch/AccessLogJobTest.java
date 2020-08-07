@@ -9,18 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-@SpringBootTest({
-    "job=accessLogJob",
-    "access-log=classpath:/sample-access-log.csv"
-})
+@SpringBootTest("access-log=classpath:/sample-access-log.csv")
 public class AccessLogJobTest {
 
   @Autowired
   DataSource dataSource;
 
   @Test
-  void launch() {
-    int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(dataSource), "access_log");
+  void launchJob() {
+    int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(this.dataSource), "access_log");
     assertThat(count).isGreaterThan(0);
   }
 }

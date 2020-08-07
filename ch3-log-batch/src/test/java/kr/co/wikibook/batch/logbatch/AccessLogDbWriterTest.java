@@ -22,7 +22,7 @@ class AccessLogDbWriterTest {
   @Test
   public void write() {
     // given
-    var writer = new AccessLogDbWriter(dataSource);
+    var writer = new AccessLogDbWriter(this.dataSource);
     var item = new AccessLog(Instant.now(), "127.0.0.1", "benelog");
 
     // when
@@ -30,7 +30,7 @@ class AccessLogDbWriterTest {
 
     // then
     int count = JdbcTestUtils.countRowsInTableWhere(
-        new JdbcTemplate(dataSource),
+        new JdbcTemplate(this.dataSource),
         "access_log",
         "ip='127.0.0.1' AND username='benelog'"
     );

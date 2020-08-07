@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 class UserAccessSummaryDbReaderTest {
 
   Logger logger = LoggerFactory.getLogger(this.getClass());
-  private static final String INSERT = "INSERT INTO access_log (access_date_time, ip, username) VALUES ";
+  static final String INSERT = "INSERT INTO access_log (access_date_time, ip, username) VALUES ";
 
   @Autowired
   DataSource dataSource;

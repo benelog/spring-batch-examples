@@ -22,15 +22,15 @@ class AccessLogCsvToDbTaskTest {
   @Test
   public void runTask() throws Exception {
     // given
-    var jobConfig = new AccessLogJobConfig(this.dataSource);
     var resource = new ClassPathResource("sample-access-log.csv");
-    CommandLineRunner task = jobConfig.accessLogCsvToDbTask(resource);
+    var config = new AccessLogJobConfig();
+    CommandLineRunner task = config.accessLogCsvToDbTask(resource, this.dataSource);
 
     // when
     task.run();
 
     // then
-    int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(dataSource), "access_log");
+    int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(this.dataSource), "access_log");
     assertThat(count).isGreaterThanOrEqualTo(3);
   }
 }

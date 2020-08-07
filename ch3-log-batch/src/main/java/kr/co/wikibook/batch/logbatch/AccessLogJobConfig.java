@@ -11,20 +11,14 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 // java -Djob=accessLogJob -Daccess-log=file:./src/test/resources/sample-access-log.csv -jar build/libs/ch3-log-batch-0.0.1-SNAPSHOT.jar
-// ./gradlew bootRun -Djob=accessLogJob -Daccess-log=file:../access-log.csv
+// ./gradlew bootRun -Daccess-log=file:../access-log.csv
 @Configuration
-@ConditionalOnProperty(value = "job", havingValue = "accessLogJob")
+@ConditionalOnProperty("access-log")
 public class AccessLogJobConfig {
-
-  private final DataSource dataSource;
-
-  public AccessLogJobConfig(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
 
   @Bean
   @Order(1)
-  public CommandLineRunner accessLogCsvToDbTask(@Value("${access-log}") Resource resource) {
+  public CommandLineRunner accessLogCsvToDbTask(@Value("${access-log}") Resource resource, DataSource dataSource) {
     var reader = new AccessLogCsvReader(resource);
     var writer = new AccessLogDbWriter(dataSource);
     return new AccessLogCsvToDbTask(reader, writer, 300);
