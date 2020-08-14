@@ -16,13 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AccessLogDbWriterTest {
 
-  @Autowired
-  DataSource dataSource;
-
   @Test
-  public void write() {
+  void write(@Autowired DataSource dataSource) {
     // given
-    var writer = new AccessLogDbWriter(this.dataSource);
+    var writer = new AccessLogDbWriter(dataSource);
     var item = new AccessLog(Instant.now(), "127.0.0.1", "benelog");
 
     // when
@@ -30,7 +27,7 @@ class AccessLogDbWriterTest {
 
     // then
     int count = JdbcTestUtils.countRowsInTableWhere(
-        new JdbcTemplate(this.dataSource),
+        new JdbcTemplate(dataSource),
         "access_log",
         "ip='127.0.0.1' AND username='benelog'"
     );
