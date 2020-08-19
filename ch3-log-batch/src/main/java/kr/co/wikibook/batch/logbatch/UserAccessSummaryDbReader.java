@@ -33,6 +33,12 @@ public class UserAccessSummaryDbReader {
     this.dataSource = dataSource;
   }
 
+  public void open() throws SQLException {
+    this.con = DataSourceUtils.getConnection(dataSource);
+    this.stmt = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+    this.resultSet = stmt.executeQuery();
+  }
+
   @Nullable
   public UserAccessSummary read() throws SQLException {
     if (this.resultSet.next()) {
@@ -41,12 +47,6 @@ public class UserAccessSummaryDbReader {
       return item;
     }
     return null;
-  }
-
-  public void open() throws SQLException {
-    this.con = DataSourceUtils.getConnection(dataSource);
-    this.stmt = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-    this.resultSet = stmt.executeQuery();
   }
 
   public void close() {
