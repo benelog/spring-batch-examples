@@ -13,7 +13,7 @@ import org.springframework.core.io.FileSystemResource;
 class UserAccessSummaryCsvWriterTest {
 
   @Test
-  void write(@TempDir Path tempPath) throws Exception {
+  void write(@TempDir Path tempPath) throws IOException {
     // given
     String outputPath = tempPath.toString() + "/user-access-summary.csv";
     var resource = new FileSystemResource(outputPath);
@@ -29,11 +29,7 @@ class UserAccessSummaryCsvWriterTest {
     writer.close();
 
     // then
-    List<String> written = readAll(outputPath);
+    List<String> written = Files.readAllLines(Path.of(outputPath));
     assertThat(written).isEqualTo(List.of("benelog,32", "jojoldu,42"));
-  }
-
-  private List<String> readAll(String path) throws IOException {
-    return Files.readAllLines(Path.of(path));
   }
 }
