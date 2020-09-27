@@ -12,16 +12,6 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set('springCloudVersion', "Hoxton.SR6")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     runtimeOnly 'com.h2database:h2'
