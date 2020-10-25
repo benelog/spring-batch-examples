@@ -13,7 +13,9 @@ public class HelloTask implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-    log.info("Hello Batch");
+    contribution.incrementReadCount();
+    contribution.incrementWriteCount(1);
+    log.info("Hello Batch : {}", chunkContext);
     return RepeatStatus.FINISHED;
   }
 }
