@@ -12,12 +12,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnProperty(name = "spring.batch.job.names", havingValue = HelloJobConfig.JOB_NAME)
 public class HelloJobConfig {
+
   public static final String JOB_NAME = "helloJob";
 
   @Bean
   public Job helloJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
     Tasklet helloTask = new HelloTask();
-    TaskletStep helloStep = stepFactory.get("helloStep").tasklet(helloTask).build();
-    return jobFactory.get(JOB_NAME).start(helloStep).build();
+    TaskletStep helloStep = stepFactory.get("helloStep")
+        .tasklet(helloTask)
+        .build();
+    return jobFactory.get(JOB_NAME)
+        .start(helloStep)
+        .build();
   }
 }
