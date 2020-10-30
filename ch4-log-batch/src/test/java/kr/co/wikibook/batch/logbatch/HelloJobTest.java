@@ -8,6 +8,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,14 @@ class HelloJobTest {
   JobLauncherTestUtils jobTester;
 
   @Test
-  void launchJob() throws Exception {
-    JobParameters params = new JobParametersBuilder()
-        .addString("runId", "myId")
-        .addJobParameters(jobTester.getUniqueJobParameters())
+  void launchJob(@Autowired JobExplorer jobExplorer) throws Exception {
+    JobParameters params = new JobParametersBuilder(jobExplorer)
+        .getNextJobParameters(jobTester.getJob())
         .toJobParameters();
 
     JobExecution execution = jobTester.launchJob(params);
+
+    assertThat(params.getLong("runId")).isNotNull();
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
 

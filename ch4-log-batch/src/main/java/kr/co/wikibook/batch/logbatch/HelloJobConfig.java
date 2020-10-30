@@ -4,6 +4,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,12 @@ public class HelloJobConfig {
     var validator = new DefaultJobParametersValidator();
     validator.setRequiredKeys(new String[]{"runId"});
 
+    var incrementer = new RunIdIncrementer();
+    incrementer.setKey("runId");
+
     return jobFactory.get(JOB_NAME)
         .validator(validator)
+        .incrementer(incrementer)
         .start(stepFactory.get("helloStep")
             .tasklet(new HelloTask())
             .build())
