@@ -28,6 +28,7 @@ class HelloJobTest {
   void launchJob(@Autowired JobExplorer jobExplorer) throws Exception {
     JobParameters params = new JobParametersBuilder(jobExplorer)
         .getNextJobParameters(jobTester.getJob())
+        .addString("helloDay", "2020.11.01")
         .toJobParameters();
 
     JobExecution execution = jobTester.launchJob(params);
