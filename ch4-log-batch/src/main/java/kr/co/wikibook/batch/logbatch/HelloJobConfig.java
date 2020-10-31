@@ -7,6 +7,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -27,14 +28,22 @@ public class HelloJobConfig {
     var incrementer = new RunIdIncrementer();
     incrementer.setKey("runId");
 
+    var transactionManager = new ResourcelessTransactionManager();
+
     return jobFactory.get(JOB_NAME)
         .validator(validator)
         .incrementer(incrementer)
         .start(stepFactory.get("helloStep")
             .tasklet(new HelloTask())
+            .transactionManager(transactionManager)
             .build())
         .next(stepFactory.get("helloDayStep")
             .tasklet(helloDayTask(null))
+            .transactionManager(transactionManager)
+            .build())
+        .next(stepFactory.get("repeatStep")
+            .tasklet(new RepeatTask())
+            .transactionManager(transactionManager)
             .build())
         .build();
   }
