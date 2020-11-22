@@ -19,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class HelloJobConfig {
 
   public static final String JOB_NAME = "helloJob";
+  public static final LocalDate INJECTED = null; // ApplicationContext 에 의해 주입되는 값을 표현
 
   @Bean
   public Job helloJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
@@ -37,12 +38,12 @@ public class HelloJobConfig {
             .tasklet(new HelloTask())
             .transactionManager(transactionManager)
             .build())
-        .next(stepFactory.get("helloDayStep")
-            .tasklet(helloDayTask(null))
-            .transactionManager(transactionManager)
-            .build())
         .next(stepFactory.get("repeatStep")
             .tasklet(new RepeatTask())
+            .transactionManager(transactionManager)
+            .build())
+        .next(stepFactory.get("helloDayStep")
+            .tasklet(helloDayTask(INJECTED))
             .transactionManager(transactionManager)
             .build())
         .build();
@@ -51,7 +52,9 @@ public class HelloJobConfig {
   @Bean
   @JobScope
   public HelloDayTask helloDayTask(
-      @Value("#{jobParameters[helloDay]}") @DateTimeFormat(pattern = "yyyy.MM.dd") LocalDate helloDay) {
+      @Value("#{jobParameters[helloDay]}")
+      //@DateTimeFormat(pattern = "yyyy.MM.dd")
+      LocalDate helloDay) {
     return new HelloDayTask(helloDay);
   }
 }

@@ -1,7 +1,13 @@
 package kr.co.wikibook.batch.logbatch;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -32,7 +38,6 @@ class HelloJobTest {
         .toJobParameters();
 
     JobExecution execution = jobTester.launchJob(params);
-
     assertThat(params.getLong("runId")).isNotNull();
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
