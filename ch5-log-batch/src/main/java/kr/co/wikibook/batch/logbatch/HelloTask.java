@@ -7,19 +7,15 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class RepeatTask implements Tasklet {
+public class HelloTask implements Tasklet {
 
-  private final Logger log = LoggerFactory.getLogger(RepeatTask.class);
-  private int count = 0;
+  private final Logger log = LoggerFactory.getLogger(HelloTask.class);
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-    count++;
-    log.info("count : {}", count);
+    contribution.incrementReadCount();
     contribution.incrementWriteCount(1);
-    if (count < 3) {
-      return RepeatStatus.CONTINUABLE;
-    }
+    log.info("Hello Batch : {}", chunkContext);
     return RepeatStatus.FINISHED;
   }
 }
