@@ -10,13 +10,15 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+@SpringJUnitConfig(TestDbConfig.class)
 class CountAccessLogTaskTest {
 
   @Test
-  void countAccessLog() {
+  void countAccessLog(@Autowired DataSource dataSource) {
     // given
-    DataSource dataSource = new TestDbConfig().dataSource();
     var task = new CountAccessLogTask(dataSource);
 
     StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();

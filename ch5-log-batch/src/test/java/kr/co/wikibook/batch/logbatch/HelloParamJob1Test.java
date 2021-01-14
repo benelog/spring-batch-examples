@@ -3,11 +3,7 @@ package kr.co.wikibook.batch.logbatch;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
-import org.junit.jupiter.api.BeforeAll;
+import java.util.Date;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -19,35 +15,23 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest({
-    "spring.batch.job.names=" + HelloJobConfig.JOB_NAME,
+    "spring.batch.job.names=" + HelloParamJobConfig.JOB_NAME,
     "spring.batch.job.enabled=false"
 })
 @SpringBatchTest
-class HelloJobTest {
-
-  @Autowired
-  JobLauncherTestUtils jobTester;
+class HelloParamJob1Test {
 
   @Test
-  void launchJob(@Autowired JobExplorer jobExplorer) throws Exception {
-    JobParameters params = new JobParametersBuilder(jobExplorer)
-        .getNextJobParameters(jobTester.getJob())
-        .addString("helloDay", "2020.11.01")
+  void launchJob(@Autowired JobLauncherTestUtils jobTester) throws Exception {
+    JobParameters params = new JobParametersBuilder()
+        .addDate("helloDate", new Date(0L))
+        .addString("day", "2020.11.01")
+        .addJobParameters(jobTester.getUniqueJobParameters())
         .toJobParameters();
 
     JobExecution execution = jobTester.launchJob(params);
-    assertThat(params.getLong("runId")).isNotNull();
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
-  }
-
-  @Test
-  void launchJobWithInvalidParameter() {
-    JobParameters params = jobTester.getUniqueJobParameters();
-    assertThatExceptionOfType(JobParametersInvalidException.class)
-        .isThrownBy(() -> jobTester.launchJob(params))
-        .withMessageContaining("do not contain required keys: [runId]");
   }
 }

@@ -23,7 +23,7 @@ public class CountAccessLogTask implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
     long count = jdbc.queryForObject("SELECT COUNT(1) FROM access_log", Long.class);
 
-    StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+    StepExecution stepExecution = contribution.getStepExecution();
     ExecutionContext executionContext = stepExecution.getExecutionContext();
     executionContext.put("count", count);
     return RepeatStatus.FINISHED;

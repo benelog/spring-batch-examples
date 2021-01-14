@@ -1,9 +1,13 @@
 package kr.co.wikibook.batch.logbatch;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
@@ -20,6 +24,8 @@ public class AccessLogCsvReader {
   public void open() throws IOException { // <4>
     InputStream inputStream = resource.getInputStream();
     this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+    bufferedReader = new BufferedReader(new FileReader(inputFile));
+
   }
 
   @Nullable // <5>
@@ -34,4 +40,24 @@ public class AccessLogCsvReader {
   public void close() throws IOException { // <6>
     this.bufferedReader.close();
   }
+
+  private boolean isCsvFile(Path path)  {
+    File inputFile = path.toFile();
+    try ( var lineReader = new BufferedReader(new FileReader(inputFile)) ) {
+
+      String line = null;
+
+      while ((line = lineReader.readLine()) != null) {
+        if (!line.contains(",")) {
+          return false;
+        }
+        if (!StringUtils.isAsciiPrintable(row)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
 }

@@ -4,6 +4,8 @@ import javax.sql.DataSource;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +28,16 @@ public class CheckStatusJobConfig {
         ).next(stepFactory.get("countAccessLogStep")
             .tasklet(new CountAccessLogTask(dataSource))
             .build()
-        )
+        ).next(stepFactory.get("accessExecutionContext")
+        .tasklet(accessTasket())
+        .build()
+    )
         .build();
+  }
+
+  private Tasklet accessTasket() {
+    var tasklet = new CallableTaskletAdapter();
+    tasklet.setCallable(new AccessExecutionContextTask());
+    return tasklet;
   }
 }

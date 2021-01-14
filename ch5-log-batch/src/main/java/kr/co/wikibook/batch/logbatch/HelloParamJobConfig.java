@@ -7,41 +7,39 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttribute;
 
 @Configuration
-@ConditionalOnProperty(name = "spring.batch.job.names", havingValue = HelloJobConfig.JOB_NAME)
-public class HelloJobConfig {
+@ConditionalOnProperty(name = "spring.batch.job.names", havingValue = HelloParamJobConfig.JOB_NAME)
+public class HelloParamJobConfig {
 
-  public static final String JOB_NAME = "helloJob";
+  public static final String JOB_NAME = "helloParamJob";
   public static final LocalDate INJECTED = null; // ApplicationContext 에 의해 주입되는 값을 표현
 
   @Bean
-  public Job helloJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
-    var validator = new DefaultJobParametersValidator();
-    validator.setRequiredKeys(new String[]{"runId"});
-
+  public Job helloParamJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+    var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
     var incrementer = new RunIdIncrementer();
     incrementer.setKey("runId");
 
-    var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
+    var validator = new DefaultJobParametersValidator();
+    validator.setRequiredKeys(new String[]{"runId"});
 
-    return jobFactory.get(JOB_NAME)
+    return jobBuilderFactory.get(JOB_NAME)
         .validator(validator)
         .incrementer(incrementer)
-        .start(stepFactory.get("helloStep")
-            .tasklet(new HelloTask())
+        .start(stepBuilderFactory.get("helloDate")
+            .tasklet(new HelloDateTask())
             .transactionAttribute(noTransaction)
             .build())
-        .next(stepFactory.get("helloDayStep")
-            .tasklet(helloDayTask(INJECTED))
+        .next(stepBuilderFactory.get("helloLocalDate")
+            .tasklet(helloLocalDateTask(INJECTED))
             .transactionAttribute(noTransaction)
             .build())
         .build();
@@ -49,10 +47,10 @@ public class HelloJobConfig {
 
   @Bean
   @JobScope
-  public HelloDayTask helloDayTask(
-      @Value("#{jobParameters[helloDay]}")
-      //@DateTimeFormat(pattern = "yyyy.MM.dd")
+  public HelloLocalDateTask helloLocalDateTask(
+      @Value("#{jobParameters[day]}")
+      @DateTimeFormat(pattern = "yyyy.MM.dd")
       LocalDate helloDay) {
-    return new HelloDayTask(helloDay);
+    return new HelloLocalDateTask(helloDay);
   }
 }
