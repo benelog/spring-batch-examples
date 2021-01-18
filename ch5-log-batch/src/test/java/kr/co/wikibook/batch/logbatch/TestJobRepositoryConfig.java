@@ -24,11 +24,10 @@ public class TestJobRepositoryConfig {
         .setName("test-job-db")
         .setType(EmbeddedDatabaseType.H2)
         .addScript("classpath:org/springframework/batch/core/schema-drop-h2.sql")
-        .addScript("classpath:org/springframework/batch/core/schema-h2.sql")
         .build();
   }
 
-//  @Bean
+  @Bean
   public BatchDataSourceInitializer dataSourceInitializer(BatchProperties props, ApplicationContext context) {
     return new BatchDataSourceInitializer(this.jobDb, context, props);
   }

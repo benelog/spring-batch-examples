@@ -25,7 +25,7 @@ public class CountAccessLogTask implements Tasklet {
 
     StepExecution stepExecution = contribution.getStepExecution();
     ExecutionContext executionContext = stepExecution.getExecutionContext();
-    executionContext.put("count", count);
+    executionContext.putLong("count", count);
     return RepeatStatus.FINISHED;
   }
 }

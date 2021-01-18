@@ -8,6 +8,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,24 +23,20 @@ import org.springframework.test.context.ActiveProfiles;
 class CheckStatusJobTest {
 
   @Autowired
-  JobLauncherTestUtils jobTester;
+  JobLauncherTestUtils testUtils;
 
   @Test
-  void launchJob() throws Exception {
-    JobParameters params = new JobParametersBuilder()
-        .addString("directory", "/")
-        .addLong("minUsablePercentage", 5L)
-        .addJobParameters(jobTester.getUniqueJobParameters())
-        .toJobParameters();
-
-    JobExecution execution = jobTester.launchJob(params);
-
+  void launchCountAccessLogStep() throws Exception {
+    JobExecution execution = testUtils.launchStep("countAccessLogStep");
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
 
   @Test
-  void launchCountAccessLogStep() throws Exception {
-    JobExecution execution = jobTester.launchStep("countAccessLogStep");
+  void launchLogDiskSpaceStep() throws Exception {
+    var jobExecutionContext = new ExecutionContext();
+    jobExecutionContext.putLong("usablePercentage", 50L);
+
+    JobExecution execution = testUtils.launchStep("logDiskSpaceStep", jobExecutionContext);
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
 }
