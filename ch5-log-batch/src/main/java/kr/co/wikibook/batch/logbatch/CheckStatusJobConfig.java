@@ -46,8 +46,7 @@ public class CheckStatusJobConfig {
             .tasklet(logDiskSpaceTask(0L))
             .transactionAttribute(noTransaction)
             .build()
-        )
-        .build();
+        ).build();
   }
 
   @Bean

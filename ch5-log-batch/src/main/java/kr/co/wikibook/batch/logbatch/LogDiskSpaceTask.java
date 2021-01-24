@@ -14,7 +14,7 @@ public class LogDiskSpaceTask implements Callable<RepeatStatus> {
   }
 
   @Override
-  public RepeatStatus call() throws Exception {
+  public RepeatStatus call() {
     log.info("사용 가능한 디스크 용량 : {}%", this.usablePercentage);
     return RepeatStatus.FINISHED;
   }
