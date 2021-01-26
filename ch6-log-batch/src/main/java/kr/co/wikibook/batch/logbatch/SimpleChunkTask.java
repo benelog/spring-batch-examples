@@ -1,7 +1,5 @@
 package kr.co.wikibook.batch.logbatch;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.batch.core.StepContribution;
@@ -14,8 +12,7 @@ public abstract class SimpleChunkTask<I> implements Tasklet {
   protected int chunkSize = 100;
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-      throws SQLException, IOException {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
     List<I> chunk = new LinkedList<>();
     while (true) {
       I item = read();
@@ -34,11 +31,11 @@ public abstract class SimpleChunkTask<I> implements Tasklet {
     }
   }
 
-  abstract void open() throws IOException, SQLException;
+  abstract void open();
 
-  abstract I read() throws SQLException;
+  abstract I read();
 
-  abstract void write(List<I> items) throws IOException;
+  abstract void write(List<I> items);
 
-  abstract void close() throws IOException;
+  abstract void close();
 }

@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class UserAccessSummaryDbReaderTest {
 
-  Logger logger = LoggerFactory.getLogger(this.getClass());
-
   @Autowired
   DataSource dataSource;
 
