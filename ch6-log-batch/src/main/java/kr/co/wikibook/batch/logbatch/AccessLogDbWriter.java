@@ -11,10 +11,10 @@ public class AccessLogDbWriter implements ItemWriter<AccessLog> {
       "INSERT INTO access_log(access_date_time, ip, username)"
           + "VALUES (:accessDateTime, :ip, :username)";
 
-  private final NamedParameterJdbcTemplate db;
+  private final NamedParameterJdbcTemplate jdbc;
 
   public AccessLogDbWriter(DataSource dataSource) {
-    this.db = new NamedParameterJdbcTemplate(dataSource);
+    this.jdbc = new NamedParameterJdbcTemplate(dataSource);
   }
 
   @Override
@@ -23,6 +23,6 @@ public class AccessLogDbWriter implements ItemWriter<AccessLog> {
         items.stream()
             .map(BeanPropertySqlParameterSource::new)
             .toArray(BeanPropertySqlParameterSource[]::new);
-    db.batchUpdate(INSERT_STMT, params);
+    this.jdbc.batchUpdate(INSERT_STMT, params);
   }
 }

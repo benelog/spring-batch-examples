@@ -1,8 +1,10 @@
 package kr.co.wikibook.batch.logbatch;
 
-import java.io.Closeable;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Scanner;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
@@ -10,37 +12,43 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 public class AccessLogCsvReader implements ItemStreamReader<AccessLog> {
-  private Scanner scanner;
-  private final AccessLogLineMapper lineMapper = new AccessLogLineMapper();
-  private final Resource resource;
+    private final AccessLogLineMapper lineMapper = new AccessLogLineMapper();
+    private final Resource resource;
+    private BufferedReader bufferedReader;
 
-  public AccessLogCsvReader(Resource resource)  {
-    this.resource = resource;
-  }
-
-  @Override
-  public void open(ExecutionContext executionContext) throws ItemStreamException {
-    try {
-      this.scanner = new Scanner(resource.getInputStream());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    public AccessLogCsvReader(Resource resource) {
+        this.resource = resource;
     }
-  }
 
-  @Nullable
-  public AccessLog read() {
-    if (this.scanner.hasNext()) {
-      return this.lineMapper.mapLine(this.scanner.nextLine());
+    @Override
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+        InputStream inputStream;
+        try {
+            inputStream = this.resource.getInputStream();
+        } catch (IOException ex) {
+            throw new ItemStreamException("Error while opening " + this.resource, ex);
+        }
+        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
     }
-    return null;
-  }
 
-  @Override
-  public void update(ExecutionContext executionContext) throws ItemStreamException {
-  }
+    @Nullable
+    public AccessLog read() throws IOException {
+        String line = this.bufferedReader.readLine();
+        if (line == null) {
+            return null;
+        }
+        return this.lineMapper.mapLine(line);
+    }
 
-  @Override
-  public void close() {
-    this.scanner.close();
-  }
+    @Override
+    public void update(ExecutionContext executionContext) throws ItemStreamException {
+    }
+
+    public void close() throws ItemStreamException {
+        try {
+            this.bufferedReader.close();
+        } catch (IOException ex) {
+            throw new ItemStreamException("Error while closing " + this.resource, ex);
+        }
+    }
 }

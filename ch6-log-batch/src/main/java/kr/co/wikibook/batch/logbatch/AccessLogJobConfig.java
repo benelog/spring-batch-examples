@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-// 실행 방법
-// ./gradlew bootRun -Djob=accessLogJob --args="accessLog=file:../access-log.csv"
 @Configuration
 @ConditionalOnProperty(name = "job", havingValue = AccessLogJobConfig.JOB_NAME)
 public class AccessLogJobConfig {
@@ -22,7 +20,7 @@ public class AccessLogJobConfig {
   public static final Resource INJECTED_RESOURCED = null;
 
   @Bean
-  public Job accessLogJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory,
+  public Job accessLogJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
       DataSource dataSource) {
 
     AccessLogCsvReader csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
@@ -30,15 +28,15 @@ public class AccessLogJobConfig {
 
     Resource userAccessOutput = new FileSystemResource("user-access-summary.csv");
 
-    return jobFactory
+    return jobBuilderFactory
         .get(JOB_NAME)
-        .start(stepFactory.get("accessLogCsvToDb")
+        .start(stepBuilderFactory.get("accessLogCsvToDb")
             .<AccessLog, AccessLog>chunk(300)
             .reader(csvReader) // resource는 Spring에 의해 주입
             .processor(new AccessLogProcessor())
             .writer(new AccessLogDbWriter(dataSource))
             .build())
-        .next(stepFactory.get("userAccessSummaryDbToCsv")
+        .next(stepBuilderFactory.get("userAccessSummaryDbToCsv")
             .<UserAccessSummary, UserAccessSummary>chunk(300)
             .reader(new UserAccessSummaryDbReader(dataSource))
             .writer(new UserAccessSummaryCsvWriter(userAccessOutput))

@@ -18,24 +18,20 @@ class UserAccessSummaryCsvWriterTest {
   void write(@TempDir Path tempPath) throws Exception {
     // given
     String outputPath = tempPath.toString() + "/user-access-summary.csv";
-    Resource resource = new FileSystemResource(outputPath);
+    var resource = new FileSystemResource(outputPath);
     var items = List.of(
         new UserAccessSummary("benelog", 32),
         new UserAccessSummary("jojoldu", 42)
     );
-    var writer = new UserAccessSummaryCsvWriter(resource);
 
     // when
+    var writer = new UserAccessSummaryCsvWriter(resource);
     writer.open(new ExecutionContext());
     writer.write(items);
     writer.close();
 
     // then
-    List<String> written = readAll(outputPath);
+    List<String> written = Files.readAllLines(Path.of(outputPath));
     assertThat(written).isEqualTo(List.of("benelog,32", "jojoldu,42"));
-  }
-
-  private List<String> readAll(String path) throws IOException {
-    return Files.readAllLines(Path.of(path));
   }
 }

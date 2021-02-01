@@ -2,7 +2,6 @@ package kr.co.wikibook.batch.logbatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -13,7 +12,7 @@ import org.springframework.core.io.FileSystemResource;
 class UserAccessSummaryCsvWriterTest {
 
   @Test
-  void write(@TempDir Path tempPath) throws IOException {
+  void write(@TempDir Path tempPath) throws Exception {
     // given
     String outputPath = tempPath.toString() + "/user-access-summary.csv";
     var resource = new FileSystemResource(outputPath);
