@@ -1,8 +1,6 @@
 package kr.co.wikibook.batch.logbatch;
 
 import java.util.PrimitiveIterator.OfInt;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -11,10 +9,7 @@ import org.springframework.batch.core.resource.StepExecutionSimpleCompletionPoli
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.policy.CompositeCompletionPolicy;
-import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.policy.TimeoutTerminationPolicy;
+import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,12 +49,7 @@ public class HelloChunkJobConfig {
   ItemReader<Integer> sequenceReader(int from, int to) {
     IntStream itemRange = IntStream.range(from, to + 1);
     OfInt iterator = itemRange.iterator();
-    return () -> {
-      if (iterator.hasNext()) {
-        return iterator.next();
-      }
-      return null;
-    };
+    return new IteratorItemReader<>(iterator);
   }
 
   ItemProcessor<Integer, Integer> plus10Processor() {
