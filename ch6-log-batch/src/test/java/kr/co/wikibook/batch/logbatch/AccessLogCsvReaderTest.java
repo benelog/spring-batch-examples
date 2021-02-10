@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.core.io.ClassPathResource;
 
 class AccessLogCsvReaderTest {
@@ -31,5 +33,12 @@ class AccessLogCsvReaderTest {
 
     // then
     assertThat(itemCount).isEqualTo(3);
+  }
+
+  @Test
+  void instanceOfItemStream() {
+    var config = new AccessLogJobConfig();
+    ItemReader<AccessLog> accessLogCsvReader = config.accessLogCsvReader(null);
+    assertThat(accessLogCsvReader).isInstanceOf(ItemStream.class);
   }
 }

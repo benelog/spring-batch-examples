@@ -22,13 +22,13 @@ public class AccessLogCsvReader implements ItemStreamReader<AccessLog> {
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        InputStream inputStream;
-        try {
-            inputStream = this.resource.getInputStream();
-        } catch (IOException ex) {
-            throw new ItemStreamException("Error while opening " + this.resource, ex);
-        }
-        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+//        InputStream inputStream;
+//        try {
+//            inputStream = this.resource.getInputStream();
+//        } catch (IOException ex) {
+//            throw new ItemStreamException("Error while opening " + this.resource, ex);
+//        }
+//        this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
     }
 
     @Nullable
