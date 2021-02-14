@@ -16,21 +16,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AccessLogCsvToDbTaskTest {
 
-  @Autowired
-  DataSource dataSource;
-
   @Test
-  public void runTask() throws Exception {
+  public void runTask(@Autowired DataSource dataSource) throws Exception {
     // given
     var resource = new ClassPathResource("sample-access-log.csv");
     var config = new AccessLogJobConfig();
-    CommandLineRunner task = config.accessLogCsvToDbTask(resource, this.dataSource);
+    CommandLineRunner task = config.accessLogCsvToDbTask(resource, dataSource);
 
     // when
     task.run();
 
     // then
-    int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(this.dataSource), "access_log");
+    int count = JdbcTestUtils.countRowsInTable(new JdbcTemplate(dataSource), "access_log");
     assertThat(count).isGreaterThanOrEqualTo(3);
   }
 }
