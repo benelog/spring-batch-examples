@@ -5,13 +5,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,7 +29,6 @@ public class AccessLogJobConfig {
     ItemStreamReader<AccessLog> csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
     Resource userAccessOutput = new FileSystemResource("user-access-summary.csv");
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
-
     return jobBuilderFactory
         .get(JOB_NAME)
         .start(stepBuilderFactory.get("accessLogCsvToDb")
