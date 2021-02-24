@@ -16,7 +16,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-class AccessLogCsvMultiReaderTest {
+class AccessLogCsvMultiResourceReaderTest {
 
   Logger logger = LoggerFactory.getLogger(this.getClass());
 

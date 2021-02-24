@@ -12,7 +12,7 @@ class AccessLogLineMapperTest {
     // given
     var jobConfig = new AccessLogJobConfig();
     var line = "2020-06-20 12:14:16,175.242.91.54,benelog";
-    LineMapper<AccessLog> lineMapper = jobConfig.constructAccessLogLineMapper();
+    LineMapper<AccessLog> lineMapper = jobConfig.buildAccessLogLineMapper();
 
     // when
     AccessLog log = lineMapper.mapLine(line, 0);

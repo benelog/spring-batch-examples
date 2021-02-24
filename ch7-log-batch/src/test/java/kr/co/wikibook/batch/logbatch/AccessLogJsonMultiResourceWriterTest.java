@@ -19,7 +19,7 @@ import org.springframework.batch.item.json.JsonObjectMarshaller;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-class AccessLogJsonMultiWriterTest {
+class AccessLogJsonMultiResourceWriterTest {
 
   @Test
   void writeMulti(@TempDir Path tempPath) throws Exception {

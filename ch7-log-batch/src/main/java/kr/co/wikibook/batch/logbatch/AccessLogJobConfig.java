@@ -36,7 +36,7 @@ public class AccessLogJobConfig {
       DataSource dataSource) {
 
     ItemStreamReader<AccessLog> csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
-    Resource userAccessOutput = new FileSystemResource("user-access-summary.csv");
+    var userAccessOutput = new FileSystemResource("user-access-summary.csv");
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
     return jobBuilderFactory
         .get(JOB_NAME)
@@ -49,7 +49,7 @@ public class AccessLogJobConfig {
         .next(stepBuilderFactory.get("userAccessSummaryDbToCsv")
             .<UserAccessSummary, UserAccessSummary>chunk(300)
             .reader(new UserAccessSummaryDbReader(dataSource))
-            .writer(userAccessSummaryCsvWriter(userAccessOutput))
+            .writer(buildCsvWriter(userAccessOutput))
             .transactionAttribute(noTransaction)
             .build())
         .build();
@@ -67,27 +67,27 @@ public class AccessLogJobConfig {
     return new FlatFileItemReaderBuilder<AccessLog>()
         .name("accessLogCsvReader")
         .resource(resource)
-        .lineMapper(constructAccessLogLineMapper())
+        .lineMapper(buildAccessLogLineMapper())
         .build();
   }
 
-  FlatFileItemWriter<UserAccessSummary> userAccessSummaryCsvWriter(Resource resource) {
+  FlatFileItemWriter<UserAccessSummary> buildCsvWriter(Resource resource) {
     return new FlatFileItemWriterBuilder<UserAccessSummary>()
         .name("userAccessSummaryCsvWriter")
         .resource(resource)
         .delimited()
-        .fieldExtractor(constructUserAccessSummaryFieldSetExtractor())
+        .fieldExtractor(buildUserAccessSummaryFieldSetExtractor())
         .build();
   }
 
-  LineMapper<AccessLog> constructAccessLogLineMapper() {
+  LineMapper<AccessLog> buildAccessLogLineMapper() {
     var lineMapper = new DefaultLineMapper<AccessLog>();
     lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
     lineMapper.setFieldSetMapper(new AccessLogFieldSetMapper());
     return lineMapper;
   }
 
-  FieldExtractor<UserAccessSummary> constructUserAccessSummaryFieldSetExtractor() {
+  FieldExtractor<UserAccessSummary> buildUserAccessSummaryFieldSetExtractor() {
     BeanWrapperFieldExtractor<UserAccessSummary> fieldExtractor = new BeanWrapperFieldExtractor<>();
     fieldExtractor.setNames(new String[]{"username", "accessCount"});
     return fieldExtractor;
