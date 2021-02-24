@@ -22,8 +22,8 @@ class AccessLogCsvMultiResourceReaderTest {
 
   @Test
   void read() throws Exception {
-    var resourceResolver = new PathMatchingResourcePatternResolver();
-    Resource[] resources = resourceResolver.getResources("classpath:/multi/*.csv");
+    var resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    Resource[] resources = resourcePatternResolver.getResources("classpath:/multi/*.csv");
 
     MultiResourceItemReader<AccessLog> reader = new MultiResourceItemReaderBuilder<AccessLog>()
         .name("accessLogMultiFileReader")
