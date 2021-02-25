@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 
 public class UserAccessSummaryCsvWriter {
+  public static final String LINE_SEPARATOR = System.getProperty("line.separator");
   private final Resource resource;
   private final UserAccessSummaryLineAggregator lineAggregator = new UserAccessSummaryLineAggregator();
   private BufferedWriter lineWriter;
@@ -18,7 +19,8 @@ public class UserAccessSummaryCsvWriter {
 
   public void write(List<UserAccessSummary> items) throws IOException {
     for (UserAccessSummary item : items) {
-      lineWriter.write(lineAggregator.aggregate(item));
+      this.lineWriter.write(lineAggregator.aggregate(item));
+      this.lineWriter.write(LINE_SEPARATOR);
     }
   }
 
@@ -27,6 +29,6 @@ public class UserAccessSummaryCsvWriter {
   }
 
   public void close() throws IOException {
-    lineWriter.close();
+    this.lineWriter.close();
   }
 }

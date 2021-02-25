@@ -12,7 +12,7 @@ import org.springframework.batch.item.ItemStreamWriter;
 import org.springframework.core.io.Resource;
 
 public class UserAccessSummaryCsvWriter implements ItemStreamWriter<UserAccessSummary> {
-
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private final Resource resource;
     private final UserAccessSummaryLineAggregator lineAggregator = new UserAccessSummaryLineAggregator();
     private BufferedWriter lineWriter;
@@ -34,6 +34,7 @@ public class UserAccessSummaryCsvWriter implements ItemStreamWriter<UserAccessSu
     public void write(List<? extends UserAccessSummary> items) throws Exception {
         for (UserAccessSummary item : items) {
             this.lineWriter.write(lineAggregator.aggregate(item));
+            this.lineWriter.write(LINE_SEPARATOR);
         }
     }
 

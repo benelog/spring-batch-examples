@@ -19,9 +19,8 @@ class ResourceItemReaderTest {
   void readResources(@TempDir Path tempPath) throws Exception {
     // given
     createFile(tempPath, "1.txt", "2.txt", "3.txt");
-    String absPath = tempPath.toAbsolutePath().toString();
-    String txtPattern = "file:" + absPath + "/*.txt";
-    ResourcesItemReader reader = buildResourceItemReader(txtPattern);
+    String txtFilePattern = "file:" + tempPath + "/*.txt";
+    ResourcesItemReader reader = buildResourceItemReader(txtFilePattern);
 
     // when, then
     reader.open(new ExecutionContext());
@@ -32,18 +31,18 @@ class ResourceItemReaderTest {
     reader.close();
   }
 
-  ResourcesItemReader buildResourceItemReader(String locationPattern) throws IOException {
+  private void createFile(Path directory, String... fileNames) throws IOException {
+    for (String each : fileNames) {
+      Path file = directory.resolve(Path.of(each));
+      Files.write(file, List.of("test content"));
+    }
+  }
+
+  private ResourcesItemReader buildResourceItemReader(String locationPattern) throws IOException {
     var resourcePatternResolver = new PathMatchingResourcePatternResolver();
     Resource[] resources = resourcePatternResolver.getResources(locationPattern);
     var reader = new ResourcesItemReader();
     reader.setResources(resources);
     return reader;
-  }
-
-  private void createFile(Path directory, String... fileNames) throws IOException {
-    for (String fileName : fileNames) {
-      Path file = directory.resolve(Path.of(fileName));
-      Files.write(file, List.of("test content"));
-    }
   }
 }

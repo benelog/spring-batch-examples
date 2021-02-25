@@ -15,8 +15,8 @@ class AccessLogCsvReaderTest {
   @Test
   void readLines() throws Exception {
     // given
-    var jobConfig = new AccessLogJobConfig();
     var resource = new ClassPathResource("sample-access-log.csv");
+    var jobConfig = new AccessLogJobConfig();
     FlatFileItemReader<AccessLog> reader = jobConfig.accessLogCsvReader(resource);
     reader.afterPropertiesSet();
 

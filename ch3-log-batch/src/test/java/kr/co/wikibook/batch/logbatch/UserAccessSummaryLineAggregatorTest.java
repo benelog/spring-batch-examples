@@ -16,6 +16,6 @@ class UserAccessSummaryLineAggregatorTest {
     String line = lineAggregator.aggregate(summary);
 
     //then
-    assertThat(line).isEqualTo("benelog,3\n");
+    assertThat(line).isEqualTo("benelog,3");
   }
 }
