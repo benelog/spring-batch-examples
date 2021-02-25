@@ -16,13 +16,13 @@ class UserAccessSummaryCsvWriterTest {
     // given
     String outputPath = tempPath.toString() + "/user-access-summary.csv";
     var resource = new FileSystemResource(outputPath);
+    var writer = new UserAccessSummaryCsvWriter(resource);
     var items = List.of(
         new UserAccessSummary("benelog", 32),
         new UserAccessSummary("jojoldu", 42)
     );
 
     // when
-    var writer = new UserAccessSummaryCsvWriter(resource);
     writer.open();
     writer.write(items);
     writer.close();

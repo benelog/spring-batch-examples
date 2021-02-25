@@ -17,15 +17,15 @@ public class UserAccessSummaryCsvWriter {
     this.resource = resource;
   }
 
+  public void open() throws IOException {
+    this.lineWriter = Files.newBufferedWriter(Paths.get(resource.getURI()));
+  }
+
   public void write(List<UserAccessSummary> items) throws IOException {
     for (UserAccessSummary item : items) {
       this.lineWriter.write(lineAggregator.aggregate(item));
       this.lineWriter.write(LINE_SEPARATOR);
     }
-  }
-
-  public void open() throws IOException {
-    this.lineWriter = Files.newBufferedWriter(Paths.get(resource.getURI()));
   }
 
   public void close() throws IOException {
