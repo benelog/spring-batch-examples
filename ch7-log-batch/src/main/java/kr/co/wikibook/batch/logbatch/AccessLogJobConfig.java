@@ -8,10 +8,8 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldExtractor;
@@ -32,7 +30,8 @@ public class AccessLogJobConfig {
   public static final Resource INJECTED_RESOURCED = null;
 
   @Bean
-  public Job accessLogJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+  public Job accessLogJob(JobBuilderFactory jobBuilderFactory,
+      StepBuilderFactory stepBuilderFactory,
       DataSource dataSource) {
 
     ItemStreamReader<AccessLog> csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
@@ -60,14 +59,11 @@ public class AccessLogJobConfig {
   public FlatFileItemReader<AccessLog> accessLogCsvReader(
       @Value("#{jobParameters['accessLog']}") Resource resource) {
 
-//    var reader = new FlatFileItemReader<AccessLog>();
-//    reader.setResource(resource);
-//    reader.setLineMapper(new AccessLogLineMapper());
-//    return reader;
     return new FlatFileItemReaderBuilder<AccessLog>()
         .name("accessLogCsvReader")
         .resource(resource)
-        .lineMapper(buildAccessLogLineMapper())
+        .lineTokenizer(new DelimitedLineTokenizer())
+        .fieldSetMapper(new AccessLogFieldSetMapper())
         .build();
   }
 
@@ -76,15 +72,9 @@ public class AccessLogJobConfig {
         .name("userAccessSummaryCsvWriter")
         .resource(resource)
         .delimited()
+        .delimiter(",")
         .fieldExtractor(buildUserAccessSummaryFieldSetExtractor())
         .build();
-  }
-
-  LineMapper<AccessLog> buildAccessLogLineMapper() {
-    var lineMapper = new DefaultLineMapper<AccessLog>();
-    lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
-    lineMapper.setFieldSetMapper(new AccessLogFieldSetMapper());
-    return lineMapper;
   }
 
   FieldExtractor<UserAccessSummary> buildUserAccessSummaryFieldSetExtractor() {

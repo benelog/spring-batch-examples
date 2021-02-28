@@ -2,15 +2,14 @@ package kr.co.wikibook.batch.logbatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 
 class UserAccessSummaryCsvWriterTest {
 
@@ -19,13 +18,15 @@ class UserAccessSummaryCsvWriterTest {
     // given
     String outputPath = tempPath.toString() + "/user-access-summary.csv";
     var resource = new FileSystemResource(outputPath);
+    FlatFileItemWriter writer = new AccessLogJobConfig().buildCsvWriter(resource);
+    writer.afterPropertiesSet();
+
     var items = List.of(
         new UserAccessSummary("benelog", 32),
         new UserAccessSummary("jojoldu", 42)
     );
 
     // when
-    var writer = new UserAccessSummaryCsvWriter(resource);
     writer.open(new ExecutionContext());
     writer.write(items);
     writer.close();

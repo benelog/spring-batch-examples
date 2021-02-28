@@ -13,7 +13,7 @@ class FixLengthLineMapperTest {
   void mapLine() throws Exception {
     // given
     var line = "2020-06-20 12:14:16 175.242.91.54   benelog   ";
-    LineMapper<AccessLog> lineMapper = buildAccessLogLineMapper();
+    LineMapper<AccessLog> lineMapper = this.buildAccessLogLineMapper();
 
     // when
     AccessLog log = lineMapper.mapLine(line, 0);
