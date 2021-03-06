@@ -51,10 +51,28 @@ public class AtomEntry {
     return content;
   }
 
-  @XmlAccessorType(XmlAccessType.FIELD)
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setUpdated(Instant updated) {
+    this.updated = updated;
+  }
+
+  public void setLink(Link link) {
+    this.link = link;
+  }
+
+  public void setAuthor(Author author) {
+    this.author = author;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
   public static class Link {
 
-    @XmlAttribute
     private String href;
 
     public Link() {
@@ -68,9 +86,11 @@ public class AtomEntry {
       return href;
     }
 
+    @XmlAttribute
+    public void setHref(String href) {
+      this.href = href;
+    }
   }
-
-  @XmlAccessorType(XmlAccessType.FIELD)
 
   public static class Author {
 
@@ -85,6 +105,10 @@ public class AtomEntry {
 
     public String getName() {
       return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
     }
   }
 }

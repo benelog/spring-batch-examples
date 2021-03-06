@@ -13,7 +13,7 @@ class AccessLogCsvReaderTest {
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Test
-  void readLines() throws Exception {
+  void readItems() throws Exception {
     // given
     var resource = new ClassPathResource("sample-access-log.csv");
     var jobConfig = new AccessLogJobConfig();

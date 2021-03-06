@@ -1,6 +1,5 @@
 package kr.co.wikibook.batch.logbatch;
 
-import javax.sql.DataSource;
 import kr.co.wikibook.batch.logbatch.atom.AtomEntry;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -16,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 @Configuration
 @ConditionalOnProperty(name = "spring.batch.job.names", havingValue = CollectBlogPostJobConfig.JOB_NAME)
@@ -25,6 +26,7 @@ public class CollectBlogPostJobConfig {
 
   @Bean
   public Job collectBlogPostJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
+    var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
 
     return jobFactory
         .get(JOB_NAME)
@@ -34,6 +36,7 @@ public class CollectBlogPostJobConfig {
             .reader(atomEntryReader(null))
             .processor(new AtomEntryProcessor())
             .writer(blogPostWriter(null))
+            .transactionAttribute(noTransaction)
             .build())
         .build();
   }
@@ -54,7 +57,7 @@ public class CollectBlogPostJobConfig {
 
   @Bean
   public StaxEventItemWriter<BlogPost> blogPostWriter(
-      @Value("${blog.collection-file}") Resource resource) {
+      @Value("${blog.file}") Resource resource) {
 
     var marshaller = new Jaxb2Marshaller();
     marshaller.setClassesToBeBound(BlogPost.class);

@@ -7,14 +7,14 @@
   <icon>https://spring.io/favicon.ico</icon>
   <updated>2020-02-12T19:36:16Z</updated>
   <entry>
-    <title>Spring Integration 5.3 Milestone 2 Available</title>
-    <link rel="alternate" href="https://spring.io/blog/2020/02/12/spring-integration-5-3-milestone-2-available" />
-    <category term="releases" label="Releases" />
+    <title>This Week in Spring - February 23rd, 2021</title>
+    <link rel="alternate" href="https://spring.io/blog/2021/02/23/this-week-in-spring-february-23rd-2021" />
+    <category term="engineering" label="Engineering" />
     <author>
-      <name>Artem Bilan</name>
+      <name>Josh Long</name>
     </author>
-    <id>tag:spring.io,2020-02-12:3959</id>
-    <updated>2020-02-12T19:36:16Z</updated>
+    <id>tag:spring.io,2021-02-24:4373</id>
+    <updated>2021-02-24T03:18:00Z</updated>
     <content type="html">&lt;div class="paragraph"&gt;
 &lt;p&gt;On behalf of the Spring Integration team, I’m pleased to announce the &lt;a href="https://github.com/spring-projects/spring-integration/releases/tag/v5.3.0.M2"&gt;second&lt;/a&gt; milestone for Spring Integration &lt;code&gt;5.3&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;

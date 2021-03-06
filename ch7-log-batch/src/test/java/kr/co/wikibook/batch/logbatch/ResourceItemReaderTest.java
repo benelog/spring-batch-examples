@@ -18,9 +18,9 @@ class ResourceItemReaderTest {
   @Test
   void readResources(@TempDir Path tempPath) throws Exception {
     // given
-    createFile(tempPath, "1.txt", "2.txt", "3.txt");
+    this.createFile(tempPath, "1.txt", "2.txt", "3.txt");
     String txtFilePattern = "file:" + tempPath + "/*.txt";
-    ResourcesItemReader reader = buildResourceItemReader(txtFilePattern);
+    ResourcesItemReader reader = this.buildResourceItemReader(txtFilePattern);
 
     // when, then
     reader.open(new ExecutionContext());

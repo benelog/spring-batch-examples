@@ -1,5 +1,7 @@
 package kr.co.wikibook.batch.logbatch;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.beans.ConstructorProperties;
 import java.time.Instant;
 
@@ -9,6 +11,7 @@ public class AccessLog {
   private final String username;
 
   @ConstructorProperties({"accessDateTime","ip","username"})
+  @JsonCreator
   public AccessLog(Instant accessDateTime, String ip, String username) {
     this.accessDateTime = accessDateTime;
     this.ip = ip;

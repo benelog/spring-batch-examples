@@ -1,18 +1,13 @@
 package kr.co.wikibook.batch.logbatch;
 
 import java.time.Instant;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name = "post")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class BlogPost {
   private String title;
   private String url;
-
-  @XmlJavaTypeAdapter(InstantAdapter.class)
   private Instant updatedAt;
 
   public BlogPost() {
@@ -33,7 +28,20 @@ public class BlogPost {
     return url;
   }
 
+  @XmlJavaTypeAdapter(InstantAdapter.class)
   public Instant getUpdatedAt() {
     return updatedAt;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  public void setUpdatedAt(Instant updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }
