@@ -31,34 +31,35 @@ public class TransactionalFileJobConfig {
   @Bean
   public Job transactionalFileJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
     var numberOutput = new FileSystemResource("numbers.txt");
+    var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
 
     var writer = new CompositeItemWriterBuilder<Integer>()
         .delegates(
-            buildFlatFileItemWriter(numberOutput),
-            buildIntentionalErrorWriter()
+            this.buildFlatFileItemWriter(numberOutput),
+            this.buildIntentionalErrorWriter(13)
         ).build();
 
     return jobFactory
         .get(JOB_NAME)
         .start(stepFactory.get("generateSequenceFile")
-            .transactionManager(new ResourcelessTransactionManager())
+//            .transactionManager(new ResourcelessTransactionManager())
             .<Integer, Integer>chunk(10)
             .reader(buildSequenceReader(1, 30))
             .writer(writer)
+            .transactionAttribute(noTransaction)
             .build())
         .build();
   }
 
   ItemReader<Integer> buildSequenceReader(int from, int to) {
     IntStream itemRange = IntStream.range(from, to + 1);
-    OfInt iterator = itemRange.iterator();
-    return new IteratorItemReader<>(iterator);
+    return new IteratorItemReader<>(itemRange.iterator());
   }
 
-  ItemWriter<Integer> buildIntentionalErrorWriter() {
+  ItemWriter<Integer> buildIntentionalErrorWriter(int errorItem) {
     return (numbers) -> {
       for (Integer number : numbers) {
-        if (number == 13) {
+        if (number == errorItem) {
           throw new IllegalStateException("의도적인 에러");
         }
         System.out.println(number);
@@ -70,6 +71,7 @@ public class TransactionalFileJobConfig {
     return new FlatFileItemWriterBuilder<Integer>()
         .name("userAccessSummaryCsvWriter")
         .resource(resource)
+        .transactional(true)
         .delimited()
         .fieldExtractor(new PassThroughFieldExtractor<>())
         .build();

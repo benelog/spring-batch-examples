@@ -20,10 +20,10 @@ class AccessLogJobTest {
 
   @Test
   void launchJob(@Autowired JobLauncherTestUtils testUtils) throws Exception {
-//    JobParameters params = testUtils.getUniqueJobParametersBuilder()
-//        .addString("accessLog", "file:./src/test/resources/sample-access-log.csv")
-//        .toJobParameters();
-//    JobExecution execution = testUtils.launchJob(params);
-//    assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
+    JobParameters params = testUtils.getUniqueJobParametersBuilder()
+        .addString("accessLog", "file:./src/test/resources/sample-access-log.csv")
+        .toJobParameters();
+    JobExecution execution = testUtils.launchJob(params);
+    assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
 }

@@ -17,22 +17,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 class AccessLogCsvMultiResourceReaderTest {
-
   Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Test
-  void read() throws Exception {
-    var resourcePatternResolver = new PathMatchingResourcePatternResolver();
-    Resource[] resources = resourcePatternResolver.getResources("classpath:/multi/*.csv");
+  void readItemsInMultiFile() throws Exception {
+    // given
+    MultiResourceItemReader<AccessLog> reader = this.buildMultiResourceItemReader("classpath:/multi/*.csv");
 
-    MultiResourceItemReader<AccessLog> reader = new MultiResourceItemReaderBuilder<AccessLog>()
-        .name("accessLogMultiFileReader")
-        .resources(resources)
-        .delegate(constructDelegator())
-        .build();
-
+    // when
     reader.open(new ExecutionContext());
-
     int itemCount = 0;
     AccessLog item;
     while ((item = reader.read()) != null) {
@@ -40,20 +33,30 @@ class AccessLogCsvMultiResourceReaderTest {
       logger.debug("{}", item);
     }
     reader.close();
+
+    // then
     assertThat(itemCount).isEqualTo(6);
   }
 
-  private FlatFileItemReader<AccessLog> constructDelegator() {
-    return new FlatFileItemReaderBuilder<AccessLog>()
-        .name("accessLogCsvReader")
-        .lineMapper(constructAccessLogLineMapper())
+  MultiResourceItemReader<AccessLog> buildMultiResourceItemReader(String locationPattern)
+      throws Exception {
+    var resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    Resource[] resources = resourcePatternResolver.getResources(locationPattern);
+    FlatFileItemReader<AccessLog> delegator = buildDelegator();
+    delegator.afterPropertiesSet();
+
+    return new MultiResourceItemReaderBuilder<AccessLog>()
+        .name("accessLogMultiFileReader")
+        .resources(resources)
+        .delegate(delegator)
         .build();
   }
 
-  private LineMapper<AccessLog> constructAccessLogLineMapper() {
-    var lineMapper = new DefaultLineMapper<AccessLog>();
-    lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
-    lineMapper.setFieldSetMapper(new AccessLogFieldSetMapper());
-    return lineMapper;
+  FlatFileItemReader<AccessLog> buildDelegator() {
+    return new FlatFileItemReaderBuilder<AccessLog>()
+        .name("accessLogCsvReader")
+        .lineTokenizer(new DelimitedLineTokenizer())
+        .fieldSetMapper(new AccessLogFieldSetMapper())
+        .build();
   }
 }

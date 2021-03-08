@@ -33,16 +33,16 @@ public class CollectBlogPostJobConfig {
         .incrementer(new RunIdIncrementer())
         .start(stepFactory.get("collectBlogPostStep")
             .<AtomEntry, BlogPost>chunk(10)
-            .reader(atomEntryReader(null))
+            .reader(atomEntryXmlReader(null))
             .processor(new AtomEntryProcessor())
-            .writer(blogPostWriter(null))
+            .writer(blogPostXmlWriter(null))
             .transactionAttribute(noTransaction)
             .build())
         .build();
   }
 
   @Bean
-  public StaxEventItemReader<AtomEntry> atomEntryReader(
+  public StaxEventItemReader<AtomEntry> atomEntryXmlReader(
       @Value("${blog.atom-url}") Resource resource) {
 
     var unmarshaller = new Jaxb2Marshaller();
@@ -56,7 +56,7 @@ public class CollectBlogPostJobConfig {
   }
 
   @Bean
-  public StaxEventItemWriter<BlogPost> blogPostWriter(
+  public StaxEventItemWriter<BlogPost> blogPostXmlWriter(
       @Value("${blog.file}") Resource resource) {
 
     var marshaller = new Jaxb2Marshaller();

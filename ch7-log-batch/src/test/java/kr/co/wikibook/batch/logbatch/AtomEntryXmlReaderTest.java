@@ -9,14 +9,14 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.ClassPathResource;
 
-class AtomEntryReaderTest {
+class AtomEntryXmlReaderTest {
 
   @Test
   void readItems() throws Exception {
     // given
     var resource = new ClassPathResource("blog.atom");
     var jobConfig = new CollectBlogPostJobConfig();
-    StaxEventItemReader<AtomEntry> reader = jobConfig.atomEntryReader(resource);
+    StaxEventItemReader<AtomEntry> reader = jobConfig.atomEntryXmlReader(resource);
     reader.afterPropertiesSet();
 
     // when
