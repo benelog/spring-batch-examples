@@ -19,9 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 class HelloJobTest {
 
   @Test
-  void launchJob(@Autowired JobLauncherTestUtils jobTester) throws Exception { // <3>
-    JobParameters params = jobTester.getUniqueJobParameters(); // <4>
-    JobExecution execution = jobTester.launchJob(params);
+  void launchJob(@Autowired JobLauncherTestUtils testUtils) throws Exception { // <3>
+    JobParameters params = testUtils.getUniqueJobParameters(); // <4>
+    JobExecution execution = testUtils.launchJob(params);
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
 }
