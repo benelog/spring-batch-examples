@@ -23,15 +23,26 @@ public class AccessLogJobConfig {
   public static final String JOB_NAME = "accessLogJob";
   public static final Resource INJECTED_RESOURCED = null;
 
-  @Bean
-  public Job accessLogJob(JobBuilderFactory jobBuilderFactory,
-      StepBuilderFactory stepBuilderFactory,
-      DataSource dataSource) {
+  private final JobBuilderFactory jobBuilderFactory;
+  private final StepBuilderFactory stepBuilderFactory;
+  private final DataSource dataSource;
 
-    return jobBuilderFactory
+  public AccessLogJobConfig(
+      JobBuilderFactory jobBuilderFactory,
+      StepBuilderFactory stepBuilderFactory,
+      DataSource dataSource
+  ) {
+    this.jobBuilderFactory = jobBuilderFactory;
+    this.stepBuilderFactory = stepBuilderFactory;
+    this.dataSource = dataSource;
+  }
+
+  @Bean
+  public Job accessLogJob() {
+    return this.jobBuilderFactory
         .get(JOB_NAME)
-        .start(this.buildCsvToDbStep(stepBuilderFactory, dataSource))
-        .next(this.buildDbToCsvStep(stepBuilderFactory, dataSource))
+        .start(this.buildCsvToDbStep())
+        .next(this.buildDbToCsvStep())
         .build();
   }
 
@@ -42,24 +53,22 @@ public class AccessLogJobConfig {
     return new AccessLogCsvReader(resource);
   }
 
-  private TaskletStep buildCsvToDbStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource) {
+  private TaskletStep buildCsvToDbStep() {
     ItemStreamReader<AccessLog> csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
-
     return stepBuilderFactory.get("accessLogCsvToDb")
         .<AccessLog, AccessLog>chunk(300)
         .reader(csvReader)
         .processor(new AccessLogProcessor())
-        .writer(new AccessLogDbWriter(dataSource))
+        .writer(new AccessLogDbWriter(this.dataSource))
         .build();
   }
 
-  private TaskletStep buildDbToCsvStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource) {
+  private TaskletStep buildDbToCsvStep() {
     Resource userAccessOutput = new FileSystemResource("user-access-summary.csv");
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
-
     return stepBuilderFactory.get("userAccessSummaryDbToCsv")
         .<UserAccessSummary, UserAccessSummary>chunk(300)
-        .reader(new UserAccessSummaryDbReader(dataSource))
+        .reader(new UserAccessSummaryDbReader(this.dataSource))
         .writer(new UserAccessSummaryCsvWriter(userAccessOutput))
         .transactionAttribute(noTransaction)
         .build();

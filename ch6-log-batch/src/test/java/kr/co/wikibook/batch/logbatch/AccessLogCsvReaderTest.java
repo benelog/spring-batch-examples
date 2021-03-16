@@ -37,7 +37,7 @@ class AccessLogCsvReaderTest {
 
   @Test
   void instanceOfItemStream() {
-    var config = new AccessLogJobConfig();
+    var config = new AccessLogJobConfig(null, null, null);
     ItemReader<AccessLog> accessLogCsvReader = config.accessLogCsvReader(null);
     assertThat(accessLogCsvReader).isInstanceOf(ItemStream.class);
   }
