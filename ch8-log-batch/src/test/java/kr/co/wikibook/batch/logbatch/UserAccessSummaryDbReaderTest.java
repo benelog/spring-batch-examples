@@ -23,13 +23,9 @@ class UserAccessSummaryDbReaderTest {
   })
   void readItems(@Autowired DataSource dataSource) throws Exception {
     // given
-    var jobConfig = new AccessLogJobConfig();
-    JdbcCursorItemReader<UserAccessSummary> reader = jobConfig
-        .buildUserAccessSummaryReader(dataSource);
+    JdbcCursorItemReader<UserAccessSummary> reader = UserAccessSummaryComponents.buildDbReader(dataSource);
 
     // when
-    reader.afterPropertiesSet();
-
     reader.open(new ExecutionContext());
     UserAccessSummary item1 = reader.read();
     UserAccessSummary item2 = reader.read();

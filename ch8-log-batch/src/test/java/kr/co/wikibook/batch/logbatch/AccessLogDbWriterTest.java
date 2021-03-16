@@ -20,7 +20,7 @@ class AccessLogDbWriterTest {
   @Test
   public void write(@Autowired DataSource dataSource) throws Exception {
     // given
-    JdbcBatchItemWriter<AccessLog> writer = new AccessLogJobConfig().buildAccessLogWriter(dataSource);
+    JdbcBatchItemWriter<AccessLog> writer = AccessLogComponents.buildAccessLogWriter(dataSource);
     var item = new AccessLog(Instant.now(), "127.0.0.1", "benelog");
 
     // when

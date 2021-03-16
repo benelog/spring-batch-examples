@@ -18,7 +18,7 @@ class UserAccessSummaryCsvWriterTest {
     // given
     String outputPath = tempPath.toString() + "/user-access-summary.csv";
     var resource = new FileSystemResource(outputPath);
-    FlatFileItemWriter writer = new AccessLogJobConfig().buildUserAccessSummaryWriter(resource);
+    FlatFileItemWriter writer = UserAccessSummaryComponents.buildCsvWriter(resource);
     writer.afterPropertiesSet();
 
     var items = List.of(
