@@ -33,9 +33,9 @@ public class CollectBlogPostJobConfig {
         .incrementer(new RunIdIncrementer())
         .start(stepFactory.get("collectBlogPostStep")
             .<AtomEntry, BlogPost>chunk(10)
-            .reader(atomEntryXmlReader(null))
+            .reader(this.atomEntryXmlReader(null))
             .processor(new AtomEntryProcessor())
-            .writer(blogPostXmlWriter(null))
+            .writer(this.blogPostXmlWriter(null))
             .transactionAttribute(noTransaction)
             .build())
         .build();
