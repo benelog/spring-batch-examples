@@ -2,6 +2,7 @@ package kr.co.wikibook.batch.logbatch;
 
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -35,24 +36,42 @@ public class AccessLogJobConfig {
 
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
+  private final DataSource dataSource;
 
-  public AccessLogJobConfig(JobBuilderFactory jobBuilderFactory,
-      StepBuilderFactory stepBuilderFactory) {
+  public AccessLogJobConfig(
+      JobBuilderFactory jobBuilderFactory,
+      StepBuilderFactory stepBuilderFactory,
+      DataSource dataSource
+  ) {
     this.jobBuilderFactory = jobBuilderFactory;
     this.stepBuilderFactory = stepBuilderFactory;
+    this.dataSource = dataSource;
   }
 
   @Bean
-  public Job accessLogJob(DataSource dataSource) throws Exception {
+  public Job accessLogJob() throws Exception {
     return this.jobBuilderFactory
         .get(JOB_NAME)
-        .start(this.buildCsvToDbStep(dataSource))
-        .next(this.buildDbToCsvStep(dataSource))
+        .start(this.buildCsvToDbStep())
+        .next(this.buildDbToCsvStep())
         .build();
   }
 
-  TaskletStep buildDbToCsvStep(DataSource dataSource) throws Exception {
-    JdbcCursorItemReader<UserAccessSummary> dbReader = UserAccessSummaryComponents.buildDbReader(dataSource);
+  @Bean
+  @StepScope
+  public FlatFileItemReader<AccessLog> accessLogReader(
+      @Value("#{jobParameters['accessLog']}") Resource resource) {
+
+    return new FlatFileItemReaderBuilder<AccessLog>()
+        .name("accessLogCsvReader")
+        .resource(resource)
+        .lineTokenizer(new DelimitedLineTokenizer())
+        .fieldSetMapper(new AccessLogFieldSetMapper())
+        .build();
+  }
+
+  private TaskletStep buildDbToCsvStep() {
+    JdbcCursorItemReader<UserAccessSummary> dbReader = UserAccessSummaryComponents.buildDbReader(this.dataSource);
 
     var userAccessOutput = new FileSystemResource("user-access-summary.csv");
     FlatFileItemWriter<UserAccessSummary> csvWriter = UserAccessSummaryComponents.buildCsvWriter(userAccessOutput);
@@ -67,27 +86,14 @@ public class AccessLogJobConfig {
         .build();
   }
 
-  private TaskletStep buildCsvToDbStep(DataSource dataSource) {
+  private TaskletStep buildCsvToDbStep() {
     ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED_RESOURCED);
-    JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents.buildAccessLogWriter(dataSource);
+    JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents.buildAccessLogWriter(this.dataSource);
     return this.stepBuilderFactory.get("accessLogCsvToDb")
         .<AccessLog, AccessLog>chunk(300)
         .reader(csvReader)
         .processor(new AccessLogProcessor())
         .writer(dbWriter)
-        .build();
-  }
-
-  @Bean
-  @StepScope
-  public FlatFileItemReader<AccessLog> accessLogReader(
-      @Value("#{jobParameters['accessLog']}") Resource resource) {
-
-    return new FlatFileItemReaderBuilder<AccessLog>()
-        .name("accessLogCsvReader")
-        .resource(resource)
-        .lineTokenizer(new DelimitedLineTokenizer())
-        .fieldSetMapper(new AccessLogFieldSetMapper())
         .build();
   }
 }

@@ -17,7 +17,7 @@ public class UserAccessSummaryComponents {
         .delimiter(",")
         .fieldExtractor(new UserAccessSummaryFieldSetExtractor())
         .build();
-    return ConfigUtils.afterPropertiesSet(writer);
+    return Configs.afterPropertiesSet(writer);
   }
 
   public static JdbcCursorItemReader<UserAccessSummary> buildDbReader(DataSource dataSource) {
@@ -31,6 +31,6 @@ public class UserAccessSummaryComponents {
                 resultSet.getInt("access_count")
             ))
         .build();
-    return ConfigUtils.afterPropertiesSet(reader);
+    return Configs.afterPropertiesSet(reader);
   }
 }

@@ -13,6 +13,6 @@ public class AccessLogComponents {
         .sql(AccessLogSqls.INSERT)
         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
         .build();
-    return ConfigUtils.afterPropertiesSet(writer);
+    return Configs.afterPropertiesSet(writer);
   }
 }
