@@ -2,8 +2,8 @@ package kr.co.wikibook.batch.logbatch;
 
 public class UserAccessSummary {
 
-  private String username;
-  private int accessCount;
+  private final String username;
+  private final int accessCount;
 
   public UserAccessSummary(String username, int accessCount) {
     this.username = username;

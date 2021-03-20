@@ -46,9 +46,6 @@ class AccessLogJsonWriterTest {
     ObjectMapper objectMapper = new ObjectMapper()
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .registerModule(new JavaTimeModule());
-
-    JacksonJsonObjectMarshaller<AccessLog> marshaller = new JacksonJsonObjectMarshaller<>();
-    marshaller.setObjectMapper(objectMapper);
-    return marshaller;
+    return new JacksonJsonObjectMarshaller<>(objectMapper);
   }
 }

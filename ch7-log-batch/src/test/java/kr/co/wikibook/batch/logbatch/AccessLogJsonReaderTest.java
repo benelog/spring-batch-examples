@@ -32,9 +32,6 @@ class AccessLogJsonReaderTest {
     ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new JavaTimeModule())
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-    var jsonObjectReader = new JacksonJsonObjectReader<>(AccessLog.class);
-    jsonObjectReader.setMapper(objectMapper);
-    return jsonObjectReader;
+    return new JacksonJsonObjectReader<>(objectMapper, AccessLog.class);
   }
 }
