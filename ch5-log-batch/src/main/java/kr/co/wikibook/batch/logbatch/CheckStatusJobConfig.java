@@ -42,7 +42,7 @@ public class CheckStatusJobConfig {
     return jobBuilderFactory.get(JOB_NAME)
         .validator(validator)
         .start(this.buildCountAccessLogStep(dataSource))
-        .next(this.checkDiskSpaceStep())
+        .next(this.buildCheckDiskSpaceStep())
         .next(this.buildLogDiskSpaceTask())
         .build();
   }
@@ -59,23 +59,24 @@ public class CheckStatusJobConfig {
     return tasklet;
   }
 
-  private TaskletStep buildLogDiskSpaceTask() {
-    return stepBuilderFactory.get("logDiskSpaceStep")
-        .tasklet(logDiskSpaceTask(0L))
+  private TaskletStep buildCountAccessLogStep(DataSource dataSource) {
+    return stepBuilderFactory.get("countAccessLogStep")
+        .tasklet(new CountAccessLogTask(dataSource))
         .transactionAttribute(NO_TX)
         .build();
   }
 
-  private TaskletStep checkDiskSpaceStep() {
+  private TaskletStep buildCheckDiskSpaceStep() {
     return stepBuilderFactory.get("checkDiskSpaceStep")
         .tasklet(new CheckDiskSpaceTask())
         .transactionAttribute(NO_TX)
         .build();
   }
 
-  private TaskletStep buildCountAccessLogStep(DataSource dataSource) {
-    return stepBuilderFactory.get("countAccessLogStep")
-        .tasklet(new CountAccessLogTask(dataSource))
+
+  private TaskletStep buildLogDiskSpaceTask() {
+    return stepBuilderFactory.get("logDiskSpaceStep")
+        .tasklet(logDiskSpaceTask(0L))
         .transactionAttribute(NO_TX)
         .build();
   }

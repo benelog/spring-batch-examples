@@ -58,16 +58,16 @@ public class HelloParamJobConfig {
     return new HelloLocalDateTask(helloDay);
   }
 
-  private TaskletStep buildHelloLocalDateStep() {
-    return stepBuilderFactory.get("helloLocalDate")
-        .tasklet(this.helloLocalDateTask(INJECTED))
+  private TaskletStep buildHelloDateStep() {
+    return this.stepBuilderFactory.get("helloDate")
+        .tasklet(new HelloDateTask())
         .transactionAttribute(NO_TX)
         .build();
   }
 
-  private TaskletStep buildHelloDateStep() {
-    return this.stepBuilderFactory.get("helloDate")
-        .tasklet(new HelloDateTask())
+  private TaskletStep buildHelloLocalDateStep() {
+    return stepBuilderFactory.get("helloLocalDate")
+        .tasklet(this.helloLocalDateTask(INJECTED))
         .transactionAttribute(NO_TX)
         .build();
   }
