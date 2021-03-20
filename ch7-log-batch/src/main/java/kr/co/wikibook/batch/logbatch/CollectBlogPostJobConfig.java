@@ -25,13 +25,13 @@ public class CollectBlogPostJobConfig {
   public static final String JOB_NAME = "collectBlogPostJob";
 
   @Bean
-  public Job collectBlogPostJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
+  public Job collectBlogPostJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
 
-    return jobFactory
+    return jobBuilderFactory
         .get(JOB_NAME)
         .incrementer(new RunIdIncrementer())
-        .start(stepFactory.get("collectBlogPostStep")
+        .start(stepBuilderFactory.get("collectBlogPostStep")
             .<AtomEntry, BlogPost>chunk(10)
             .reader(this.atomEntryXmlReader(null))
             .processor(new AtomEntryProcessor())

@@ -5,7 +5,6 @@ import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.core.io.Resource;
 
 public class UserAccessSummaryComponents {
-
   public static FlatFileItemWriter<UserAccessSummary> buildCsvWriter(Resource resource) {
     var writer =  new FlatFileItemWriterBuilder<UserAccessSummary>()
         .name("userAccessSummaryCsvWriter")

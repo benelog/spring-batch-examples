@@ -24,7 +24,7 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 public class AccessLogJobConfig {
 
   public static final String JOB_NAME = "accessLogJob";
-  public static final Resource INJECTED_RESOURCED = null;
+  public static final Resource INJECTED = null;
 
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
@@ -66,7 +66,7 @@ public class AccessLogJobConfig {
 
 
   private TaskletStep buildCsvToDbStep() {
-    ItemStreamReader<AccessLog> csvReader = this.accessLogCsvReader(INJECTED_RESOURCED);
+    ItemStreamReader<AccessLog> csvReader = this.accessLogCsvReader(INJECTED);
 
     return stepBuilderFactory.get("accessLogCsvToDb")
         .<AccessLog, AccessLog>chunk(300)

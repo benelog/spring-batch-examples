@@ -15,7 +15,6 @@ import org.springframework.batch.test.StepScopeTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
 
 @SpringBootTest({
     "spring.batch.job.names=" + AccessLogJobConfig.JOB_NAME,
