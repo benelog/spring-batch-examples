@@ -1,6 +1,7 @@
 package kr.co.wikibook.batch.logbatch;
 
 import javax.sql.DataSource;
+import kr.co.wikibook.batch.logbatch.util.Configs;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemWriter;

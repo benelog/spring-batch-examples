@@ -1,4 +1,4 @@
-package kr.co.wikibook.batch.logbatch;
+package kr.co.wikibook.batch.logbatch.util;
 
 import org.springframework.beans.factory.InitializingBean;
 

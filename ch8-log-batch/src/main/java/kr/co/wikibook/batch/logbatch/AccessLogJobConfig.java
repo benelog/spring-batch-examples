@@ -1,23 +1,19 @@
 package kr.co.wikibook.batch.logbatch;
 
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStreamReader;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -28,11 +24,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 @Configuration
-@ConditionalOnProperty(name = "spring.batch.job.names", havingValue = AccessLogJobConfig.JOB_NAME)
 public class AccessLogJobConfig {
 
   public static final String JOB_NAME = "accessLogJob";
-  public static final Resource INJECTED_RESOURCED = null;
+  public static final Resource INJECTED = null;
 
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
@@ -41,6 +36,7 @@ public class AccessLogJobConfig {
   public AccessLogJobConfig(
       JobBuilderFactory jobBuilderFactory,
       StepBuilderFactory stepBuilderFactory,
+      @Qualifier("mainDataSource")
       DataSource dataSource
   ) {
     this.jobBuilderFactory = jobBuilderFactory;
@@ -54,19 +50,6 @@ public class AccessLogJobConfig {
         .get(JOB_NAME)
         .start(this.buildCsvToDbStep())
         .next(this.buildDbToCsvStep())
-        .build();
-  }
-
-  @Bean
-  @StepScope
-  public FlatFileItemReader<AccessLog> accessLogReader(
-      @Value("#{jobParameters['accessLog']}") Resource resource) {
-
-    return new FlatFileItemReaderBuilder<AccessLog>()
-        .name("accessLogCsvReader")
-        .resource(resource)
-        .lineTokenizer(new DelimitedLineTokenizer())
-        .fieldSetMapper(new AccessLogFieldSetMapper())
         .build();
   }
 
@@ -87,13 +70,26 @@ public class AccessLogJobConfig {
   }
 
   private TaskletStep buildCsvToDbStep() {
-    ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED_RESOURCED);
+    ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED);
     JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents.buildAccessLogWriter(this.dataSource);
     return this.stepBuilderFactory.get("accessLogCsvToDb")
         .<AccessLog, AccessLog>chunk(300)
         .reader(csvReader)
         .processor(new AccessLogProcessor())
         .writer(dbWriter)
+        .build();
+  }
+
+  @Bean
+  @StepScope
+  public FlatFileItemReader<AccessLog> accessLogReader(
+      @Value("#{jobParameters['accessLog']}") Resource resource) {
+
+    return new FlatFileItemReaderBuilder<AccessLog>()
+        .name("accessLogCsvReader")
+        .resource(resource)
+        .lineTokenizer(new DelimitedLineTokenizer())
+        .fieldSetMapper(new AccessLogFieldSetMapper())
         .build();
   }
 }
