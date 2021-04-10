@@ -17,9 +17,6 @@ public class RepeatTask implements Tasklet {
     count++;
     log.info("count : {}", count);
     contribution.incrementWriteCount(1);
-    if (count < 3) {
-      return RepeatStatus.CONTINUABLE;
-    }
-    return RepeatStatus.FINISHED;
+    return RepeatStatus.continueIf(count < 3);
   }
 }
