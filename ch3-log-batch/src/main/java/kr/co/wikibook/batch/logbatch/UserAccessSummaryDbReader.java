@@ -5,17 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.lang.Nullable;
 
 public class UserAccessSummaryDbReader {
-  private final RowMapper<UserAccessSummary> rowMapper = (resultSet, index) ->
-      new UserAccessSummary(
-          resultSet.getString("username"),
-          resultSet.getInt("access_count")
-      );
+  private final RowMapper<UserAccessSummary> rowMapper = new DataClassRowMapper<>(UserAccessSummary.class);
 
   private final DataSource dataSource;
   private PreparedStatement stmt;

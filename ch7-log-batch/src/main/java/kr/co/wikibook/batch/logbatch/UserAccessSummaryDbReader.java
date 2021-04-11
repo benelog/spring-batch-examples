@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
+import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -15,11 +16,7 @@ import org.springframework.lang.Nullable;
 
 public class UserAccessSummaryDbReader implements ItemStreamReader<UserAccessSummary> {
 
-  private final RowMapper<UserAccessSummary> rowMapper = (resultSet, index) ->
-      new UserAccessSummary(
-          resultSet.getString("username"),
-          resultSet.getInt("access_count")
-      );
+  private final RowMapper<UserAccessSummary> rowMapper = new DataClassRowMapper<>(UserAccessSummary.class);
 
   private final DataSource dataSource;
   private PreparedStatement stmt;

@@ -7,11 +7,10 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 
 public class AccessLogComponents {
-
   public static JdbcBatchItemWriter<AccessLog> buildAccessLogWriter(DataSource dataSource) {
     var writer =  new JdbcBatchItemWriterBuilder<AccessLog>()
         .dataSource(dataSource)
-        .sql(AccessLogSqls.INSERT)
+        .sql(AccessLogSql.INSERT)
         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
         .build();
     return Configs.afterPropertiesSet(writer);

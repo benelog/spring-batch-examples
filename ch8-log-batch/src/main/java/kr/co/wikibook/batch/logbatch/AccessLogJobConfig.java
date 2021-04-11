@@ -15,7 +15,6 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -53,6 +52,17 @@ public class AccessLogJobConfig {
         .build();
   }
 
+  private TaskletStep buildCsvToDbStep() {
+    ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED);
+    JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents.buildAccessLogWriter(this.dataSource);
+    return this.stepBuilderFactory.get("accessLogCsvToDb")
+        .<AccessLog, AccessLog>chunk(300)
+        .reader(csvReader)
+        .processor(new AccessLogProcessor())
+        .writer(dbWriter)
+        .build();
+  }
+
   private TaskletStep buildDbToCsvStep() {
     JdbcCursorItemReader<UserAccessSummary> dbReader = UserAccessSummaryComponents.buildDbReader(this.dataSource);
 
@@ -66,17 +76,6 @@ public class AccessLogJobConfig {
         .reader(dbReader)
         .writer(csvWriter)
         .transactionAttribute(noTransaction)
-        .build();
-  }
-
-  private TaskletStep buildCsvToDbStep() {
-    ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED);
-    JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents.buildAccessLogWriter(this.dataSource);
-    return this.stepBuilderFactory.get("accessLogCsvToDb")
-        .<AccessLog, AccessLog>chunk(300)
-        .reader(csvReader)
-        .processor(new AccessLogProcessor())
-        .writer(dbWriter)
         .build();
   }
 

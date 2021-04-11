@@ -7,6 +7,7 @@ import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuild
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.DataClassRowMapper;
 
 public class UserAccessSummaryComponents {
 
@@ -25,12 +26,9 @@ public class UserAccessSummaryComponents {
     var reader =  new JdbcCursorItemReaderBuilder<UserAccessSummary>()
         .name("userAccessSummaryDbReader")
         .dataSource(dataSource)
-        .sql(AccessLogSqls.COUNT_GROUP_BY_USERNAME)
-        .rowMapper((resultSet, index) ->
-            new UserAccessSummary(
-                resultSet.getString("username"),
-                resultSet.getInt("access_count")
-            ))
+        .sql(AccessLogSql.COUNT_GROUP_BY_USERNAME)
+        .rowMapper(new DataClassRowMapper<>(UserAccessSummary.class))
+        .queryArguments()
         .build();
     return Configs.afterPropertiesSet(reader);
   }
