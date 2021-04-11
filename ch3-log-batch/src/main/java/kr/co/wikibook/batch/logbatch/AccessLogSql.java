@@ -1,6 +1,6 @@
 package kr.co.wikibook.batch.logbatch;
 
-public class AccessLogSqls {
+public class AccessLogSql {
 
   public static final String INSERT =
       "INSERT INTO access_log(access_date_time, ip, username)"

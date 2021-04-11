@@ -15,11 +15,6 @@ import org.springframework.lang.Nullable;
 
 public class UserAccessSummaryDbReader implements ItemStreamReader<UserAccessSummary> {
 
-  private final String sql =
-      "SELECT username, COUNT(1) AS access_count\n"
-          + "FROM access_log\n"
-          + "GROUP BY username";
-
   private final RowMapper<UserAccessSummary> rowMapper = (resultSet, index) ->
       new UserAccessSummary(
           resultSet.getString("username"),
@@ -40,7 +35,10 @@ public class UserAccessSummaryDbReader implements ItemStreamReader<UserAccessSum
   public void open(ExecutionContext executionContext) {
     this.con = DataSourceUtils.getConnection(dataSource);
     try {
-      this.stmt = con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+      this.stmt = con.prepareStatement(
+          AccessLogSql.COUNT_GROUP_BY_USERNAME,
+          ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY
+      );
       this.resultSet = stmt.executeQuery();
     } catch (SQLException e) {
       close();

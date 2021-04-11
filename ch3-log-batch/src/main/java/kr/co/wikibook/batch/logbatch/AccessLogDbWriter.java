@@ -6,11 +6,6 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class AccessLogDbWriter {
-
-  private final String INSERT_STMT =
-      "INSERT INTO access_log(access_date_time, ip, username)"
-          + "VALUES (:accessDateTime, :ip, :username)";
-
   private final NamedParameterJdbcTemplate jdbc;
 
   public AccessLogDbWriter(DataSource dataSource) {
@@ -21,6 +16,6 @@ public class AccessLogDbWriter {
     BeanPropertySqlParameterSource[] params = items.stream()
         .map(BeanPropertySqlParameterSource::new)
         .toArray(BeanPropertySqlParameterSource[]::new);
-    jdbc.batchUpdate(INSERT_STMT, params);
+    jdbc.batchUpdate(AccessLogSql.INSERT, params);
   }
 }
