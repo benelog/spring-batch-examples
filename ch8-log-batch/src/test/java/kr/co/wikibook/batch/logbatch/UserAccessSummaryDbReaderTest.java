@@ -9,8 +9,10 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringJUnitConfig(TestDbConfig.class)
+@SpringJUnitConfig(SharedConnectionDbConfig.class)
+@Transactional
 class UserAccessSummaryDbReaderTest {
 
   static final String INSERT = "INSERT INTO access_log (access_date_time, ip, username) VALUES ";
@@ -23,7 +25,7 @@ class UserAccessSummaryDbReaderTest {
   })
   void readItems(@Autowired DataSource dataSource) throws Exception {
     // given
-    JdbcCursorItemReader<UserAccessSummary> reader = UserAccessSummaryComponents.buildDbReader(dataSource);
+    JdbcCursorItemReader<UserAccessSummary> reader = UserAccessSummaryComponents.buildDbReader(dataSource, true);
 
     // when
     reader.open(new ExecutionContext());

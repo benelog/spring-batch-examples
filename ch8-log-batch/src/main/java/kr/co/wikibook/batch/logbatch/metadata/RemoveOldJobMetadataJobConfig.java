@@ -2,7 +2,6 @@ package kr.co.wikibook.batch.logbatch.metadata;
 
 import java.util.function.Supplier;
 import javax.sql.DataSource;
-import kr.co.wikibook.batch.logbatch.AccessLogJobConfig;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;

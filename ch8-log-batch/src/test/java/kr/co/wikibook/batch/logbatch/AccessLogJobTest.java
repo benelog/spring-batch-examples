@@ -12,10 +12,9 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest("spring.batch.job.names=" + AccessLogJobConfig.JOB_NAME )
 class AccessLogJobTest {
 
   private JobLauncherTestUtils testUtils = new JobLauncherTestUtils();
@@ -24,7 +23,7 @@ class AccessLogJobTest {
   void initJobLauncherTestUtils(
       @Autowired JobRepository jobRepository,
       @Autowired JobLauncher jobLauncher,
-      @Autowired @Qualifier("accessLogJob") Job job) {
+      @Autowired Job job) {
     this.testUtils.setJobRepository(jobRepository);
     this.testUtils.setJobLauncher(jobLauncher);
     this.testUtils.setJob(job);
@@ -32,10 +31,10 @@ class AccessLogJobTest {
 
   @Test
   void launchJob() throws Exception {
-    JobParameters params = testUtils.getUniqueJobParametersBuilder()
+    JobParameters params = this.testUtils.getUniqueJobParametersBuilder()
         .addString("accessLog", "file:./src/test/resources/sample-access-log.csv")
         .toJobParameters();
-    JobExecution execution = testUtils.launchJob(params);
+    JobExecution execution = this.testUtils.launchJob(params);
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
   }
 }

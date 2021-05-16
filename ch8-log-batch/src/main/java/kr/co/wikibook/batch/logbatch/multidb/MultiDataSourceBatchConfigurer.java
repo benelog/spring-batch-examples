@@ -1,4 +1,4 @@
-package kr.co.wikibook.batch.logbatch;
+package kr.co.wikibook.batch.logbatch.multidb;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -9,28 +9,27 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-public class MultiDataSourceBatchConfigurer implements BatchConfigurer {
-  private final DataSource taskletDataSource;
+public class MultiDataSourceBatchConfigurer implements BatchConfigurer, InitializingBean {
+  private final PlatformTransactionManager transactionManager;
   private final DataSource jobDataSource;
   private JobRepository jobRepository;
   private JobExplorer jobExplorer;
   private JobLauncher jobLauncher;
-  private DataSourceTransactionManager transactionManager;
 
-  public MultiDataSourceBatchConfigurer(DataSource jobDataSource, DataSource taskletDataSource) {
+  public MultiDataSourceBatchConfigurer(DataSource jobDataSource, PlatformTransactionManager transactionManager) {
     this.jobDataSource = jobDataSource;
-    this.taskletDataSource = taskletDataSource;
+    this.transactionManager = transactionManager;
   }
 
-  @PostConstruct
-  public void init() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     this.jobRepository  = createJobRepository(this.jobDataSource);
     this.jobExplorer = createJobExplorer(this.jobDataSource);
     this.jobLauncher = createJobLauncher(this.jobRepository);
-    this.transactionManager = new DataSourceTransactionManager(this.taskletDataSource);
   }
 
   @Override

@@ -2,6 +2,7 @@ package kr.co.wikibook.batch.logbatch;
 
 import javax.sql.DataSource;
 import kr.co.wikibook.batch.logbatch.util.Configs;
+import org.springframework.batch.item.database.ExtendedConnectionDataSourceProxy;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -22,13 +23,13 @@ public class UserAccessSummaryComponents {
     return Configs.afterPropertiesSet(writer);
   }
 
-  public static JdbcCursorItemReader<UserAccessSummary> buildDbReader(DataSource dataSource) {
+  public static JdbcCursorItemReader<UserAccessSummary> buildDbReader(DataSource dataSource, boolean sharedConection) {
     var reader =  new JdbcCursorItemReaderBuilder<UserAccessSummary>()
         .name("userAccessSummaryDbReader")
         .dataSource(dataSource)
+        .useSharedExtendedConnection(sharedConection)
         .sql(AccessLogSql.COUNT_GROUP_BY_USERNAME)
         .rowMapper(new DataClassRowMapper<>(UserAccessSummary.class))
-        .queryArguments()
         .build();
     return Configs.afterPropertiesSet(reader);
   }

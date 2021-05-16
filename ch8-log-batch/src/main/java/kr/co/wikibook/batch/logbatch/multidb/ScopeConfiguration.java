@@ -1,4 +1,4 @@
-package kr.co.wikibook.batch.logbatch;
+package kr.co.wikibook.batch.logbatch.multidb;
 
 import org.springframework.batch.core.scope.JobScope;
 import org.springframework.batch.core.scope.StepScope;

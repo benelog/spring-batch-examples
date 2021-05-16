@@ -2,6 +2,8 @@ package kr.co.wikibook.batch.logbatch;
 
 import javax.sql.DataSource;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
+import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.boot.autoconfigure.batch.BatchDataSourceInitializer;
@@ -14,7 +16,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.stereotype.Component;
 
-@Configuration
+//@Configuration
 public class TestJobRepositoryConfig {
 
   private final DataSource jobDb;
@@ -35,10 +37,17 @@ public class TestJobRepositoryConfig {
   @Component
   class TestBatchConfigurer extends DefaultBatchConfigurer {
     protected JobRepository createJobRepository() throws Exception {
-      DataSource jobDb = TestJobRepositoryConfig.this.jobDb;
       JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
       factory.setDataSource(jobDb);
       factory.setTransactionManager(new DataSourceTransactionManager(jobDb));
+      factory.afterPropertiesSet();
+      return factory.getObject();
+    }
+
+    @Override
+    public JobExplorer createJobExplorer() throws Exception {
+      JobExplorerFactoryBean factory = new JobExplorerFactoryBean();
+      factory.setDataSource(jobDb);
       factory.afterPropertiesSet();
       return factory.getObject();
     }

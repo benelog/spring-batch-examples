@@ -8,15 +8,16 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
-public class TestDbConfig {
+public class SharedConnectionDbConfig {
 
   @Bean
   public DataSource dataSource() {
-     return new EmbeddedDatabaseBuilder()
+    var originalDataSource = new EmbeddedDatabaseBuilder()
         .setName("log-test-db")
         .setType(EmbeddedDatabaseType.H2)
         .addScript("schema.sql")
         .build();
+    return new ExtendedConnectionDataSourceProxy(originalDataSource);
   }
 
   @Bean

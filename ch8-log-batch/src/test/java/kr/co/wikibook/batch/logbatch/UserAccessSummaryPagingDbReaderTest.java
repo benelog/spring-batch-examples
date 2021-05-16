@@ -4,31 +4,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import javax.sql.DataSource;
+import kr.co.wikibook.batch.logbatch.util.Configs;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
-import org.springframework.batch.item.database.support.H2PagingQueryProvider;
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringJUnitConfig(TestDbConfig.class)
+@Transactional
 class UserAccessSummaryPagingDbReaderTest {
 
   @Test
   @Sql("classpath:/access-log.sql")
   void readItems(@Autowired DataSource dataSource) throws Exception {
     // given
-    PagingQueryProvider queryProvider = buildPagingQueryProvider();
-    JdbcPagingItemReader<UserAccessSummary> reader = buildPagingItemReader(
-        dataSource,
-        queryProvider
-    );
-    reader.afterPropertiesSet();
+    JdbcPagingItemReader<UserAccessSummary> reader = buildPagingItemReader(dataSource, 2);
 
     // when
     UserAccessSummary item1 = reader.read();
@@ -44,24 +41,29 @@ class UserAccessSummaryPagingDbReaderTest {
     assertThat(item3).isNull();
   }
 
-  private JdbcPagingItemReader<UserAccessSummary> buildPagingItemReader(
-      DataSource dataSource, PagingQueryProvider queryProvider) {
-    JdbcPagingItemReader<UserAccessSummary> reader = new JdbcPagingItemReaderBuilder<UserAccessSummary>()
+  private JdbcPagingItemReader<UserAccessSummary> buildPagingItemReader(DataSource dataSource, int pageSize) {
+    PagingQueryProvider queryProvider = buildPagingQueryProvider(dataSource);
+    var reader = new JdbcPagingItemReaderBuilder<UserAccessSummary>()
         .name("accessLogDbReader")
         .dataSource(dataSource)
         .queryProvider(queryProvider)
         .rowMapper(new DataClassRowMapper<>(UserAccessSummary.class))
-        .pageSize(2)
+        .pageSize(pageSize)
         .build();
-    return reader;
+    return Configs.afterPropertiesSet(reader);
   }
 
-  private PagingQueryProvider buildPagingQueryProvider() {
-    var queryProvider = new H2PagingQueryProvider();
-    queryProvider.setSelectClause("username, COUNT(1) AS access_count");
-    queryProvider.setFromClause("FROM access_log");
-    queryProvider.setGroupClause("GROUP BY username");
-    queryProvider.setSortKeys(Map.of("username", Order.ASCENDING));
-    return queryProvider;
+  private PagingQueryProvider buildPagingQueryProvider(DataSource dataSource) {
+    SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
+    factory.setDataSource(dataSource);
+    factory.setSelectClause("username, COUNT(1) AS access_count");
+    factory.setFromClause("access_log");
+    factory.setGroupClause("username");
+    factory.setSortKeys(Map.of("username", Order.ASCENDING));
+    try {
+      return factory.getObject();
+    } catch (Exception ex) {
+      throw new IllegalStateException(ex);
+    }
   }
 }

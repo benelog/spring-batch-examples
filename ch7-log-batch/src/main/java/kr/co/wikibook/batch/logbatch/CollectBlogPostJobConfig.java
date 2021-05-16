@@ -27,7 +27,6 @@ public class CollectBlogPostJobConfig {
   @Bean
   public Job collectBlogPostJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
-
     return jobBuilderFactory
         .get(JOB_NAME)
         .incrementer(new RunIdIncrementer())

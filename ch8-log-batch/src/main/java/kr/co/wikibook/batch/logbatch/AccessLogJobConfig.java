@@ -15,14 +15,17 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 @Configuration
+@ConditionalOnProperty(name = "spring.batch.job.names", havingValue = AccessLogJobConfig.JOB_NAME)
 public class AccessLogJobConfig {
 
   public static final String JOB_NAME = "accessLogJob";
@@ -35,8 +38,7 @@ public class AccessLogJobConfig {
   public AccessLogJobConfig(
       JobBuilderFactory jobBuilderFactory,
       StepBuilderFactory stepBuilderFactory,
-      @Qualifier("mainDataSource")
-      DataSource dataSource
+      @Qualifier("mainDataSource") DataSource dataSource
   ) {
     this.jobBuilderFactory = jobBuilderFactory;
     this.stepBuilderFactory = stepBuilderFactory;
@@ -54,8 +56,12 @@ public class AccessLogJobConfig {
 
   private TaskletStep buildCsvToDbStep() {
     ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED);
-    JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents.buildAccessLogWriter(this.dataSource);
+    JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents
+        .buildAccessLogWriter(this.dataSource);
+    var transactionManager = new DataSourceTransactionManager(this.dataSource);
+
     return this.stepBuilderFactory.get("accessLogCsvToDb")
+        .transactionManager(transactionManager)
         .<AccessLog, AccessLog>chunk(300)
         .reader(csvReader)
         .processor(new AccessLogProcessor())
@@ -64,10 +70,12 @@ public class AccessLogJobConfig {
   }
 
   private TaskletStep buildDbToCsvStep() {
-    JdbcCursorItemReader<UserAccessSummary> dbReader = UserAccessSummaryComponents.buildDbReader(this.dataSource);
+    JdbcCursorItemReader<UserAccessSummary> dbReader = UserAccessSummaryComponents
+        .buildDbReader(this.dataSource, false);
 
     var userAccessOutput = new FileSystemResource("user-access-summary.csv");
-    FlatFileItemWriter<UserAccessSummary> csvWriter = UserAccessSummaryComponents.buildCsvWriter(userAccessOutput);
+    FlatFileItemWriter<UserAccessSummary> csvWriter = UserAccessSummaryComponents
+        .buildCsvWriter(userAccessOutput);
 
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
 

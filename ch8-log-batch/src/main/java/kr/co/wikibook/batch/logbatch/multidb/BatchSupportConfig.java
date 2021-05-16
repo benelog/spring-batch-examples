@@ -1,4 +1,4 @@
-package kr.co.wikibook.batch.logbatch;
+package kr.co.wikibook.batch.logbatch.multidb;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
@@ -10,10 +10,8 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import(ScopeConfiguration.class)
 public class BatchSupportConfig {
 
   private final BatchConfigurer batchConfigurer;

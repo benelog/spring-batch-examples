@@ -27,7 +27,7 @@ class UserAccessSummaryDbReaderTest {
       INSERT + "('2020-06-10 11:14', '192.168.0.1', 'benelog')",
       INSERT + "('2020-06-10 11:14', '192.168.0.3', 'jojoldu')"
   })
-  void readRows(@Autowired DataSource dataSource) throws SQLException {
+  void readItems(@Autowired DataSource dataSource) throws SQLException {
     // given
     this.reader = new UserAccessSummaryDbReader(dataSource);
 

@@ -35,11 +35,11 @@ task h2(type: JavaExec) {
     main = 'org.h2.tools.Console'
 
     def props = new Properties()
-    file("src/main/resources/application.properties").withInputStream { props.load(it) }
+    file("src/main/resources/application-dev.properties").withInputStream { props.load(it) }
 
     args(
-        '-driver', props.get('spring.datasource.driver-class-name'),
-        '-url', props.get('spring.datasource.url'),
-        '-user', props.get('spring.datasource.username')
+        '-driver', props.get('job-db.driver-class-name'),
+        '-url', props.get('job-db.jdbc-url'),
+        '-user', props.get('job-db.username')
     )
 }
