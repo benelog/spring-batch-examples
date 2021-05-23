@@ -5,6 +5,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -52,7 +53,7 @@ public class AccessLogJobConfig {
   }
 
   @Bean
-  @JobScope
+  @StepScope
   public FlatFileItemReader<AccessLog> accessLogCsvReader(
       @Value("#{jobParameters['accessLog']}") Resource resource) {
 
