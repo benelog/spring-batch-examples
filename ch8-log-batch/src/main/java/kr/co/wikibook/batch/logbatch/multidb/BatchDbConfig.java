@@ -16,6 +16,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class BatchDbConfig {
@@ -24,6 +25,11 @@ public class BatchDbConfig {
   @ConfigurationProperties(prefix = "main-db")
   public DataSource mainDataSource() {
     return DataSourceBuilder.create().build();
+  }
+
+  @Bean
+  public PlatformTransactionManager mainTransactionManager() {
+    return new DataSourceTransactionManager(mainDataSource());
   }
 
   @Bean
