@@ -54,7 +54,7 @@ public class AccessLogJobConfig {
         .build();
   }
 
-  private TaskletStep buildCsvToDbStep() {
+  protected TaskletStep buildCsvToDbStep() {
     ItemStreamReader<AccessLog> csvReader = this.accessLogReader(INJECTED);
     JdbcBatchItemWriter<AccessLog> dbWriter = AccessLogComponents
         .buildAccessLogWriter(this.dataSource);
@@ -69,7 +69,7 @@ public class AccessLogJobConfig {
         .build();
   }
 
-  private TaskletStep buildDbToCsvStep() {
+  protected TaskletStep buildDbToCsvStep() {
     JdbcCursorItemReader<UserAccessSummary> dbReader = UserAccessSummaryComponents
         .buildDbReader(this.dataSource, false);
 

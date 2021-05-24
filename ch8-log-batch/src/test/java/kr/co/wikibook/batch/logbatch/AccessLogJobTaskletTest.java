@@ -32,9 +32,9 @@ class AccessLogJobTaskletTest {
   Logger logger = LoggerFactory.getLogger(AccessLogJobTaskletTest.class);
 
   @Test
-  void executeAccessLogCsvToDb(@Autowired Job job) throws Exception {
+  void executeAccessLogCsvToDb(@Autowired AccessLogJobConfig config) throws Exception {
     // given
-    TaskletStep step = (TaskletStep) ((AbstractJob) job).getStep("accessLogCsvToDb");
+    TaskletStep step = config.buildCsvToDbStep();
     Tasklet tasklet = step.getTasklet();
     ItemStream stream = (ItemStream) ReflectionTestUtils.getField(step, "stream");
     JobParameters params = new JobParametersBuilder()
@@ -60,9 +60,9 @@ class AccessLogJobTaskletTest {
   }
 
   @Test
-  void executeUserAccessSummaryDbToCsv(@Autowired Job job) throws Exception {
+  void executeUserAccessSummaryDbToCsv(@Autowired AccessLogJobConfig config) throws Exception {
     // given
-    TaskletStep step = (TaskletStep) ((AbstractJob) job).getStep("userAccessSummaryDbToCsv");
+    TaskletStep step = config.buildDbToCsvStep();
     Tasklet tasklet = step.getTasklet();
     ItemStream stream = (ItemStream) ReflectionTestUtils.getField(step, "stream");
 
@@ -75,6 +75,7 @@ class AccessLogJobTaskletTest {
     stream.open(exContext);
     while (tasklet.execute(stepContribution, chunkContext).isContinuable()) {
       logger.info("continue to execute Tasklet : {}" , stepContribution);
+      // 전체 데이터가 하나의 TX로 처리되므로 데이터건이 많으면 바람직하지 못한 못한 방식
     }
     stream.close();
 
