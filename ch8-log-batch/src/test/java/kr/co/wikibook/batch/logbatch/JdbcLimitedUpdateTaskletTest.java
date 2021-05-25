@@ -27,10 +27,11 @@ class JdbcLimitedUpdateTaskletTest {
   })
   public void execute(@Autowired DataSource dataSource) throws Exception {
     // given
-    JdbcLimitedUpdateTasklet tasklet = new JdbcLimitedUpdateTasklet(
+    var tasklet = new JdbcLimitedUpdateTasklet(
         dataSource,
         "DELETE FROM access_log WHERE username = 'benelog'",
-        10);
+        10
+    );
     StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();
     var stepContribution = new StepContribution(stepExecution);
     var chunkContext = new ChunkContext(new StepContext(stepExecution));
