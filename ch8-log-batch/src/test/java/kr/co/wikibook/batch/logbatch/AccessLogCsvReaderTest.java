@@ -12,7 +12,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.batch.test.StepScopeTestUtils;
-import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
     "spring.batch.job.names=" + AccessLogJobConfig.JOB_NAME,
     "spring.batch.job.enabled=false"
 })
-@SpringBatchTest
 class AccessLogCsvReaderTest {
 
   Logger logger = LoggerFactory.getLogger(this.getClass());

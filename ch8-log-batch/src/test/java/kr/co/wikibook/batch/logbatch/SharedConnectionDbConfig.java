@@ -13,7 +13,7 @@ public class SharedConnectionDbConfig {
   @Bean
   public DataSource dataSource() {
     var originalDataSource = new EmbeddedDatabaseBuilder()
-        .setName("log-test-db")
+        .setName("log-test-db2")
         .setType(EmbeddedDatabaseType.H2)
         .addScript("schema.sql")
         .build();
