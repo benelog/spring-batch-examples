@@ -21,9 +21,9 @@ class JdbcLimitedUpdateTaskletTest {
 
   @Test
   @Sql(statements = {
-      INSERT + "('2020-06-10 11:14', '175.242.91.54', 'benelog')",
-      INSERT + "('2020-06-10 11:14', '192.168.0.1', 'benelog')",
-      INSERT + "('2020-06-10 11:14', '192.168.0.3', 'benelog')"
+      INSERT + "('2021-07-10 07:14', '175.242.91.54', 'benelog')",
+      INSERT + "('2021-07-10 07:14', '192.168.0.1', 'benelog')",
+      INSERT + "('2021-07-10 07:14', '192.168.0.3', 'benelog')"
   })
   public void execute(@Autowired DataSource dataSource) throws Exception {
     // given
