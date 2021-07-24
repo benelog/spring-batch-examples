@@ -1,0 +1,40 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'kr.co.wikibook.batch'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation("com.github.kirviq:dumbster:1.7.1")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task h2(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.h2.tools.Console'
+
+    def props = new Properties()
+    file("src/main/resources/application.properties").withInputStream { props.load(it) }
+
+    args(
+        '-driver', props.get('spring.datasource.driver-class-name'),
+        '-url', props.get('spring.datasource.url'),
+        '-user', props.get('spring.datasource.username')
+    )
+}
