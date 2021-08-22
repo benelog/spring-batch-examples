@@ -19,6 +19,14 @@ class CallUriProcessorTest {
   }
 
   @Test
+  @DisplayName("404 Not Found 응답을 받는다")
+  void processNotFound() throws Exception {
+    CallUriProcessor processor = new CallUriProcessor(Duration.ofSeconds(3));
+    ResponseStatus responseStatus = processor.process("https://benelog.net/t");
+    assertThat(responseStatus.getStatusCode()).isEqualTo(404);
+  }
+
+  @Test
   @DisplayName("타입아웃 예외가 발생한다")
   void processWhenTimeout() {
     CallUriProcessor processor = new CallUriProcessor(Duration.ofMillis(1));
