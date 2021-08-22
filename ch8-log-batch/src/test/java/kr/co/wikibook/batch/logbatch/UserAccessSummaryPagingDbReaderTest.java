@@ -54,7 +54,7 @@ class UserAccessSummaryPagingDbReaderTest {
   }
 
   private PagingQueryProvider buildPagingQueryProvider(DataSource dataSource) {
-    SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
+    var factory = new SqlPagingQueryProviderFactoryBean();
     factory.setDataSource(dataSource);
     factory.setSelectClause("username, COUNT(1) AS access_count");
     factory.setFromClause("access_log");

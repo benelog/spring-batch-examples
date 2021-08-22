@@ -1,15 +1,18 @@
 package kr.co.wikibook.batch.logbatch;
 
 import java.io.File;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CheckDiskSpaceTask implements CommandLineRunner {
+  private final Logger logger;
 
-  private final Logger logger = LoggerFactory.getLogger(CountAccessLogTask.class);
+  public CheckDiskSpaceTask(ILoggerFactory loggerFactory) {
+    this.logger = loggerFactory.getLogger(CheckDiskSpaceTask.class.getName());
+  }
 
   @Override
   public void run(String... args) {
