@@ -26,6 +26,7 @@ public class CallUriProcessor implements ItemProcessor<String, ResponseStatus> {
   public ResponseStatus process(String rawUri)
       throws IOException, InterruptedException, URISyntaxException {
 
+    logger.info("try to call {}", rawUri);
     URI uri = new URI(rawUri);
     HttpRequest request = HttpRequest.newBuilder()
         .uri(uri)
@@ -34,7 +35,7 @@ public class CallUriProcessor implements ItemProcessor<String, ResponseStatus> {
     long startTime = System.currentTimeMillis();
     HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
     long responseTime = System.currentTimeMillis() - startTime;
-    logger.info("Call to {}, responseTime {}ms", uri, responseTime);
+    logger.info("{}ms", responseTime);
     return new ResponseStatus(uri, response.statusCode(), responseTime);
   }
 }
