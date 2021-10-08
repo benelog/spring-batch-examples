@@ -1,5 +1,6 @@
 package kr.co.wikibook.batch.healthcheck;
 
+import java.net.http.HttpConnectTimeoutException;
 import java.time.Duration;
 import kr.co.wikibook.batch.healthcheck.util.Configs;
 import org.slf4j.ILoggerFactory;
@@ -29,6 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 // java -Djob.name=checkUriJob -jar build/libs/health-check-0.0.1-SNAPSHOT.jar uriListFile=file:uri-1.txt
 @Configuration
 public class CheckUriJobConfig {
+
   public static final String INPUT_FILE_PARAM = "uriListFile";
   public static final String OUTPUT_FILE_PATH = "./status.csv";
   private static final String INPUT_FILE_PARAM_EXP = "#{jobParameters['" + INPUT_FILE_PARAM + "']}";
@@ -59,8 +61,8 @@ public class CheckUriJobConfig {
   @Bean
   public Step logResourceMetaStep() {
     return stepBuilderFactory.get("logResourceMetaStep")
-//        .allowStartIfComplete(true)
-//        .startLimit(5)
+        .allowStartIfComplete(true)
+        .startLimit(5)
         .transactionManager(transactionManager)
         .tasklet(logResourceMetaTasket(null))
         .build();
@@ -74,6 +76,12 @@ public class CheckUriJobConfig {
         .reader(uriFileReader(null))
         .processor(callUriProcessor(null))
         .writer(buildResponseStatusFileWriter())
+        .faultTolerant()
+        .skip(IllegalArgumentException.class)
+        .skipLimit(2)
+        .retry(HttpConnectTimeoutException.class)
+        .retryLimit(2)
+        .noRollback(IllegalArgumentException.class)
         .build();
   }
 
@@ -105,7 +113,7 @@ public class CheckUriJobConfig {
 
   private FlatFileItemWriter<ResponseStatus> buildResponseStatusFileWriter() {
     var outputFile = new FileSystemResource(OUTPUT_FILE_PATH);
-    var writer =  new FlatFileItemWriterBuilder<ResponseStatus>()
+    var writer = new FlatFileItemWriterBuilder<ResponseStatus>()
         .name("responseStatusFileWriter")
         .resource(outputFile)
         .delimited()
