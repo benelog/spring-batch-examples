@@ -24,6 +24,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.AlwaysRetryPolicy;
+import org.springframework.retry.policy.TimeoutRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 
@@ -70,9 +73,15 @@ public class CheckUriJobConfig {
 
   @Bean
   public Step checkUriStep() {
+    TimeoutRetryPolicy retryPolicy = new TimeoutRetryPolicy();
+    retryPolicy.setTimeout(3500L); // ms
+
+    var backOffPolicy = new FixedBackOffPolicy();
+    backOffPolicy.setBackOffPeriod(1000L); // ms
+
     return stepBuilderFactory.get("checkUriStep")
         .transactionManager(transactionManager)
-        .<String, ResponseStatus>chunk(2)
+        .<String, ResponseStatus>chunk(3)
         .reader(uriFileReader(null))
         .processor(callUriProcessor(null))
         .writer(buildResponseStatusFileWriter())
@@ -80,8 +89,11 @@ public class CheckUriJobConfig {
         .skip(IllegalArgumentException.class)
         .skipLimit(2)
         .retry(HttpConnectTimeoutException.class)
-        .retryLimit(2)
+        .retryLimit(4)
+        .retryPolicy(retryPolicy)
         .noRollback(IllegalArgumentException.class)
+        .noRollback(HttpConnectTimeoutException.class)
+        .backOffPolicy(backOffPolicy)
         .build();
   }
 
