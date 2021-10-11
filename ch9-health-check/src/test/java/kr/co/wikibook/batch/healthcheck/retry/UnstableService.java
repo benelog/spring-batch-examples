@@ -29,8 +29,8 @@ public class UnstableService {
   }
 
   @Recover
-  public boolean recover(String message, Exception exception) {
-    logger.warn("Recover 실행 : {}", message, exception);
+  public boolean recover(Throwable error, String message) {
+    logger.warn("Recover 실행 : {}", message, error);
     return false;
   }
 

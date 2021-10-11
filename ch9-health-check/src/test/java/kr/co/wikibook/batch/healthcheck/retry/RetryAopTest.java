@@ -37,37 +37,31 @@ class RetryAopTest {
   @Test
   void retry(@Autowired UnstableService fail3Service) {
     boolean success = fail3Service.call("Hello.");
-    assertThat(success).isTrue();
     assertThat(fail3Service.getTryCount()).isEqualTo(4);
+    assertThat(success).isTrue();
   }
 
   @Test
   void retryAndRecover(@Autowired UnstableService fail4Service) {
     boolean success = fail4Service.call("Hello.");
-    assertThat(success).isFalse();
     assertThat(fail4Service.getTryCount()).isEqualTo(4);
+    assertThat(success).isFalse();
   }
 
   @Test
   void recoveredWithCircuit(@Autowired FragileService fail2Service) throws InterruptedException {
-    executeAndAssert(fail2Service, false, 1);
-    // call() 실행 후 recover()가 실행
-    executeAndAssert(fail2Service, false, 2);
-    // 최대 시도횟수 2번이상으로 circuit이 열림
-
-    executeAndAssert(fail2Service, false, 2);
-    // recover 결과가 나오고 실제 call() 실행 횟수 tryCount는 증가하지 않음
-
+    executeAndAssert(fail2Service, 1, false);
+    executeAndAssert(fail2Service, 2, false);
+    executeAndAssert(fail2Service, 2, false); // 차단기가 열려서 누적 시도횟수가 증가하지 않음
     TimeUnit.MILLISECONDS.sleep(310);
-    // 'resetTimeout' 이상의 시간이 지나서 circuit이 닫힘
 
-    executeAndAssert(fail2Service, true, 3);
-    // 실제 call() 메스드가 실행되고 tryCount가 증가함.
+    // 차단기가 닫힘
+    executeAndAssert(fail2Service, 3, true);
   }
 
-  private void executeAndAssert(FragileService service, boolean expectedSuccess, int tryCount) {
+  private void executeAndAssert(FragileService service, int tryCount, boolean expectedSuccess) {
     boolean success = service.call("Hello!");
-    assertThat(success).isEqualTo(expectedSuccess);
     assertThat(service.getTryCount()).isEqualTo(tryCount);
+    assertThat(success).isEqualTo(expectedSuccess);
   }
 }
