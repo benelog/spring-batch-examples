@@ -26,22 +26,5 @@ class CheckUriJobTest {
     assertThat(execution.getExitStatus()).isEqualTo(ExitStatus.COMPLETED);
     Path outputFile = Paths.get(CheckUriJobConfig.OUTPUT_FILE_PATH);
     assertThat(outputFile).isNotEmptyFile();
-
-
-
-
-
-  }
-
-  static class TestObj {
-    private Integer myValue;
-
-    public Integer getMyValue() {
-      return myValue;
-    }
-
-    public void setMyValue(Integer myValue) {
-      this.myValue = myValue;
-    }
   }
 }

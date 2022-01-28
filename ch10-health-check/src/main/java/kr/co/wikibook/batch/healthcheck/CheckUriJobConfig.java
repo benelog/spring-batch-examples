@@ -2,6 +2,8 @@ package kr.co.wikibook.batch.healthcheck;
 
 import java.net.http.HttpConnectTimeoutException;
 import java.time.Duration;
+import kr.co.wikibook.batch.healthcheck.listener.JobReporter;
+import kr.co.wikibook.batch.healthcheck.listener.LogResourceListener;
 import kr.co.wikibook.batch.healthcheck.util.Configs;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -11,8 +13,6 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
-import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.policy.AlwaysRetryPolicy;
 import org.springframework.retry.policy.TimeoutRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -54,20 +53,10 @@ public class CheckUriJobConfig {
     var validator = new DefaultJobParametersValidator();
     validator.setRequiredKeys(new String[]{INPUT_FILE_PARAM});
     return this.jobBuilderFactory.get("checkUriJob")
-//        .preventRestart()
         .validator(validator)
-        .start(logResourceMetaStep())
-        .next(checkUriStep())
-        .build();
-  }
-
-  @Bean
-  public Step logResourceMetaStep() {
-    return stepBuilderFactory.get("logResourceMetaStep")
-        .allowStartIfComplete(true)
-        .startLimit(5)
-        .transactionManager(transactionManager)
-        .tasklet(logResourceMetaTasket(null))
+        .start(checkUriStep())
+        .listener(new JobReporter())
+        .listener(logResourceListener(null))
         .build();
   }
 
@@ -99,12 +88,10 @@ public class CheckUriJobConfig {
 
   @Bean
   @JobScope
-  public Tasklet logResourceMetaTasket(
+  public LogResourceListener logResourceListener(
       @Value(INPUT_FILE_PARAM_EXP) Resource uriListFile) {
-    var tasklet = new CallableTaskletAdapter();
     ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
-    tasklet.setCallable(new LogResourceMetaTask(uriListFile, loggerFactory));
-    return tasklet;
+    return new LogResourceListener(uriListFile, loggerFactory);
   }
 
   @Bean

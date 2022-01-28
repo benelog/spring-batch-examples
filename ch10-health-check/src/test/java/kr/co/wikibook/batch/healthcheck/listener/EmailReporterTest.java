@@ -34,10 +34,10 @@ class EmailReporterTest {
     jobExec.setJobInstance(jobInstance);
     jobExec.setExitStatus(ExitStatus.COMPLETED);
     JavaMailSender mailSender = mock(JavaMailSender.class);
-    EmailJobReporter sut = new EmailJobReporter(mailSender, List.of(), true);
+    EmailJobReporter reporter = new EmailJobReporter(mailSender, List.of(), true);
 
     // when
-    sut.afterJob(jobExec);
+    reporter.afterJob(jobExec);
 
     // then
     verify(mailSender, never()).send(Mockito.any(SimpleMailMessage.class));

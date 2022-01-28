@@ -1,4 +1,4 @@
-package kr.co.wikibook.batch.healthcheck;
+package kr.co.wikibook.batch.healthcheck.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.FileSystemResource;
 import slf4jtest.LogMessage;
 import slf4jtest.Settings;
@@ -27,13 +26,12 @@ class LogResourceMetaTaskTest {
     TestLoggerFactory loggerFactory = Settings.instance()
         .enableAll()
         .buildLogging();
-    var task = new LogResourceMetaTask(resource, loggerFactory);
+    var listener = new LogResourceListener(resource, loggerFactory);
 
     // when
-    RepeatStatus status = task.call();
+    listener.logLastModified();
 
     // then
-    assertThat(status).isEqualTo(RepeatStatus.FINISHED);
     LogMessage logMessage = loggerFactory.lines().iterator().next();
     assertThat(logMessage.text).isEqualTo("uri.txt 파일 마지막 수정: 2021-08-16T12:58:54.113Z");
   }

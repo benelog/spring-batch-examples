@@ -1,7 +1,7 @@
 package kr.co.wikibook.batch.healthcheck.listener;
 
-import java.time.Instant;
 import java.util.List;
+import kr.co.wikibook.batch.healthcheck.util.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -36,35 +36,36 @@ public class EmailJobReporter extends JobExecutionListenerSupport {
       return;
     }
 
-    String jobDuration = getReadableDuration(jobExec.getStartTime().toInstant(), jobExec.getEndTime().toInstant());
-    String subject = String
-        .format("%s : %s (%s)", jobName, jobExec.getExitStatus().getExitCode(), jobDuration);
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(MAIL_SENDER);
+    message.setTo(receivers.toArray(new String[receivers.size()]));
+    message.setSubject(toSubject(jobExec, jobName));
+    message.setText(toText(jobExec));
+    mailSender.send(message);
+  }
 
+  private String toText(JobExecution jobExec) {
     StringBuilder text = new StringBuilder();
     for (StepExecution stepExec : jobExec.getStepExecutions()) {
-      String stepDuration = getReadableDuration(stepExec.getStartTime().toInstant(),
-          stepExec.getEndTime().toInstant());
+      String stepDuration = Times.getReadableDuration(
+          stepExec.getStartTime().toInstant(),
+          stepExec.getEndTime().toInstant()
+      );
       text.append(String.format("stepName: %s (%s)\n ", stepExec.getStepName(), stepDuration));
       text.append("Exceptions : " + stepExec.getFailureExceptions() + "\n");
       text.append("-------------\n");
     }
-
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom(MAIL_SENDER);
-    message.setTo(receivers.toArray(new String[receivers.size()]));
-    message.setSubject(subject);
-    message.setText(text.toString());
-    mailSender.send(message);
+    return text.toString();
   }
 
-  // 2개의 Instant의 차이를 '시:분:초' 형식으로 반환
-  public static String getReadableDuration(Instant from, Instant to) {
-    long durationSeconds = to.getEpochSecond() - from.getEpochSecond();
-    long hours = durationSeconds / 60 / 60;
-    long leftSeconds = durationSeconds - hours * 60 * 60;
-    long minuets = leftSeconds / 60;
-    long seconds = leftSeconds - minuets * 60;
-    return String.format("%d:%02d:%02d", hours, minuets, seconds);
+  private String toSubject(JobExecution jobExec, String jobName) {
+    String jobDuration = Times.getReadableDuration(
+        jobExec.getStartTime().toInstant(),
+        jobExec.getEndTime().toInstant()
+    );
+    return String.format(
+        "%s : %s (%s)",
+        jobName, jobExec.getExitStatus().getExitCode(), jobDuration
+    );
   }
 }
-
