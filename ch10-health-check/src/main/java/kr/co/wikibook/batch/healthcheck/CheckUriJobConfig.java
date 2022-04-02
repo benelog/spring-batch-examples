@@ -2,8 +2,13 @@ package kr.co.wikibook.batch.healthcheck;
 
 import java.net.http.HttpConnectTimeoutException;
 import java.time.Duration;
+import java.util.List;
+import kr.co.wikibook.batch.healthcheck.listener.EmailJobReporter;
 import kr.co.wikibook.batch.healthcheck.listener.JobReporter;
+import kr.co.wikibook.batch.healthcheck.listener.LogListener;
 import kr.co.wikibook.batch.healthcheck.listener.LogResourceListener;
+import kr.co.wikibook.batch.healthcheck.listener.LogRetryListener;
+import kr.co.wikibook.batch.healthcheck.listener.TestListener;
 import kr.co.wikibook.batch.healthcheck.util.Configs;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -24,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.policy.TimeoutRetryPolicy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -49,15 +55,27 @@ public class CheckUriJobConfig {
   }
 
   @Bean
-  public Job checkUriJob() {
+  public Job checkUriJob(JavaMailSender mailSender) {
     var validator = new DefaultJobParametersValidator();
     validator.setRequiredKeys(new String[]{INPUT_FILE_PARAM});
+
+    var emailReporter = new EmailJobReporter(mailSender, List.of("benelog@naver.com"), true);
+
     return this.jobBuilderFactory.get("checkUriJob")
         .validator(validator)
-        .start(checkUriStep())
         .listener(new JobReporter())
+        .listener(emailReporter)
         .listener(logResourceListener(null))
+        .start(checkUriStep())
         .build();
+  }
+
+  @Bean
+  @JobScope
+  public LogResourceListener logResourceListener(
+      @Value(INPUT_FILE_PARAM_EXP) Resource uriListFile) {
+    ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
+    return new LogResourceListener(uriListFile, loggerFactory);
   }
 
   @Bean
@@ -70,28 +88,24 @@ public class CheckUriJobConfig {
 
     return stepBuilderFactory.get("checkUriStep")
         .transactionManager(transactionManager)
+        .listener(new LogListener<String, ResponseStatus>())
         .<String, ResponseStatus>chunk(3)
         .reader(uriFileReader(null))
         .processor(callUriProcessor(null))
         .writer(buildResponseStatusFileWriter())
         .faultTolerant()
         .skip(IllegalArgumentException.class)
+        .skip(HttpConnectTimeoutException.class)
         .skipLimit(2)
         .retry(HttpConnectTimeoutException.class)
-        .retryLimit(4)
+        .retryLimit(3)
         .retryPolicy(retryPolicy)
+        .listener(new LogRetryListener())
         .noRollback(IllegalArgumentException.class)
         .noRollback(HttpConnectTimeoutException.class)
         .backOffPolicy(backOffPolicy)
+        .listener(new TestListener())
         .build();
-  }
-
-  @Bean
-  @JobScope
-  public LogResourceListener logResourceListener(
-      @Value(INPUT_FILE_PARAM_EXP) Resource uriListFile) {
-    ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
-    return new LogResourceListener(uriListFile, loggerFactory);
   }
 
   @Bean

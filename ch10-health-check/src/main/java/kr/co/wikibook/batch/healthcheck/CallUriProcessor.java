@@ -32,8 +32,8 @@ public class CallUriProcessor  implements
   }
 
   @Override
-  public void beforeProcess(String item) {
-    logger.info("try to call {}", item);
+  public void beforeProcess(String rawUri) {
+    logger.info("호출 시도 : {}", rawUri);
   }
 
   @Override
@@ -45,21 +45,21 @@ public class CallUriProcessor  implements
         .timeout(this.requestTimeout)
         .build();
     long startTime = System.currentTimeMillis();
-    HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+    HttpResponse<String> response = this.client.send(request, BodyHandlers.ofString());
     long responseTime = System.currentTimeMillis() - startTime;
-    logger.info("{}ms", responseTime);
     return new ResponseStatus(uri, response.statusCode(), responseTime);
   }
 
   @Override
-  public void afterProcess(String item, ResponseStatus result) {
+  public void afterProcess(String rawUri, ResponseStatus result) {
+    logger.info("응답 시간 : {}ms", result.getResponseTime());
     if(result.getStatusCode() == 404) {
-      logger.info("Page not found {}", item);
+      logger.warn("404 응답 : {}", rawUri);
     }
   }
 
   @Override
-  public void onProcessError(String item, Exception ex) {
-    logger.info("Fail to call {}", item);
+  public void onProcessError(String rawUri, Exception ex) {
+    logger.warn("호출 실패 {}", rawUri, ex);
   }
 }

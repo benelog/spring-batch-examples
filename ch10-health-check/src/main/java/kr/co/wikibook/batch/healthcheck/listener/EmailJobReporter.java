@@ -4,6 +4,7 @@ import java.util.List;
 import kr.co.wikibook.batch.healthcheck.util.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -29,19 +30,29 @@ public class EmailJobReporter extends JobExecutionListenerSupport {
 
   @Override
   public void afterJob(JobExecution jobExec) {
-    String jobName = jobExec.getJobInstance().getJobName();
-
-    if (skipOnSuccess && jobExec.getExitStatus() == ExitStatus.COMPLETED) {
-      logger.info("Skipped email report : {}", jobName);
+    if (skipOnSuccess && jobExec.getStatus() == BatchStatus.COMPLETED) {
+      logger.info("Skipped email report : {}", jobExec.getJobInstance().getJobName());
       return;
     }
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom(MAIL_SENDER);
     message.setTo(receivers.toArray(new String[receivers.size()]));
-    message.setSubject(toSubject(jobExec, jobName));
+    message.setSubject(toSubject(jobExec));
     message.setText(toText(jobExec));
     mailSender.send(message);
+  }
+
+  private String toSubject(JobExecution jobExec) {
+    String jobDuration = Times.getReadableDuration(
+        jobExec.getStartTime().toInstant(),
+        jobExec.getEndTime().toInstant()
+    );
+    String jobName = jobExec.getJobInstance().getJobName();
+    return String.format(
+        "%s : %s (%s)",
+        jobName, jobExec.getStatus(), jobDuration
+    );
   }
 
   private String toText(JobExecution jobExec) {
@@ -56,16 +67,5 @@ public class EmailJobReporter extends JobExecutionListenerSupport {
       text.append("-------------\n");
     }
     return text.toString();
-  }
-
-  private String toSubject(JobExecution jobExec, String jobName) {
-    String jobDuration = Times.getReadableDuration(
-        jobExec.getStartTime().toInstant(),
-        jobExec.getEndTime().toInstant()
-    );
-    return String.format(
-        "%s : %s (%s)",
-        jobName, jobExec.getExitStatus().getExitCode(), jobDuration
-    );
   }
 }

@@ -1,6 +1,7 @@
 package kr.co.wikibook.batch.healthcheck.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -11,10 +12,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -24,23 +24,26 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 class EmailReporterTest {
-  private final Logger logger = LoggerFactory.getLogger(EmailJobReporter.class);
 
   @Test
   void skipSendEmail() {
     // given
-    JobInstance jobInstance = new JobInstance(0L, "testJob");
-    JobExecution jobExec = new JobExecution(0L);
-    jobExec.setJobInstance(jobInstance);
-    jobExec.setExitStatus(ExitStatus.COMPLETED);
     JavaMailSender mailSender = mock(JavaMailSender.class);
-    EmailJobReporter reporter = new EmailJobReporter(mailSender, List.of(), true);
+
+    var jobInstance = new JobInstance(0L, "testJob");
+    JobExecution jobExecution = new JobExecution(0L);
+    jobExecution.setJobInstance(jobInstance);
+    jobExecution.setStatus(BatchStatus.COMPLETED);
+
+    boolean skipOnSuccess = true;
+
+    var reporter = new EmailJobReporter(mailSender, List.of(), skipOnSuccess);
 
     // when
-    reporter.afterJob(jobExec);
+    reporter.afterJob(jobExecution);
 
     // then
-    verify(mailSender, never()).send(Mockito.any(SimpleMailMessage.class));
+    verify(mailSender, never()).send(any(SimpleMailMessage.class));
   }
 
   @Test
@@ -51,37 +54,36 @@ class EmailReporterTest {
       mailSender.setHost("localhost");
       mailSender.setPort(smtpServer.getPort());
 
-      JobInstance jobInstance = new JobInstance(0L, "testJob");
+      var jobInstance = new JobInstance(0L, "testJob");
 
-      JobExecution jobExec = new JobExecution(0L);
-      jobExec.setJobInstance(jobInstance);
+      var jobExecution = new JobExecution(0L);
+      jobExecution.setJobInstance(jobInstance);
+      jobExecution.setStatus(BatchStatus.COMPLETED);
       Instant startTime = Instant.parse("2020-02-02T16:02:00Z");
       Instant endTime = Instant.parse("2020-02-02T18:08:45Z");
-      jobExec.setExitStatus(ExitStatus.COMPLETED);
-      jobExec.setStartTime(Date.from(startTime));
-      jobExec.setEndTime(Date.from(endTime));
+      jobExecution.setStartTime(Date.from(startTime));
+      jobExecution.setEndTime(Date.from(endTime));
 
-      StepExecution stepExec = new StepExecution("testStep", jobExec, 0L);
-      stepExec.setStartTime(Date.from(startTime));
-      stepExec.setEndTime(Date.from(endTime));
-      jobExec.addStepExecutions(List.of(stepExec));
+      var stepExecution = new StepExecution("testStep", jobExecution, 0L);
+      stepExecution.setStartTime(Date.from(startTime));
+      stepExecution.setEndTime(Date.from(endTime));
+      jobExecution.addStepExecutions(List.of(stepExecution));
 
-      EmailJobReporter reporter = new EmailJobReporter(
+      var reporter = new EmailJobReporter(
           mailSender,
-          List.of("sanghyuk.jung@navercorp.com"),
+          List.of("benelog@naver.com"),
           false
       );
 
       // when
-      reporter.afterJob(jobExec);
+      reporter.afterJob(jobExecution);
 
       // then
       List<SmtpMessage> emails = smtpServer.getReceivedEmails();
       assertThat(emails).hasSize(1);
       SmtpMessage email = emails.get(0);
       assertThat(email.getHeaderValue("Subject")).isEqualTo("testJob : COMPLETED (2:06:45)");
-      assertThat(email.getHeaderValue("To")).isEqualTo("sanghyuk.jung@navercorp.com");
-      logger.debug("email body : \n {}", email.getBody());
+      assertThat(email.getHeaderValue("To")).isEqualTo("benelog@naver.com");
     }
   }
 }

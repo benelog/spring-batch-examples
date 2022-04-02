@@ -12,7 +12,6 @@ public class JobReporter extends JobExecutionListenerSupport {
 
   @Override
   public void afterJob(JobExecution jobExec) {
-
     String jobName = jobExec.getJobInstance().getJobName();
     long duration = jobExec.getEndTime().getTime() - jobExec.getStartTime().getTime();
     logger.info("Job name: {}, duration : {} millisec", jobName, duration);

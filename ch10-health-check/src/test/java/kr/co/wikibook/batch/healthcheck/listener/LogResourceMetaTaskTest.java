@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.core.io.FileSystemResource;
 import slf4jtest.LogMessage;
 import slf4jtest.Settings;

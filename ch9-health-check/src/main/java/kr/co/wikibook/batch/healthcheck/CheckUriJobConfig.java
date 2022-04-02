@@ -2,6 +2,7 @@ package kr.co.wikibook.batch.healthcheck;
 
 import java.net.http.HttpConnectTimeoutException;
 import java.time.Duration;
+import kr.co.wikibook.batch.healthcheck.listener.JobReporter;
 import kr.co.wikibook.batch.healthcheck.util.Configs;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,7 @@ public class CheckUriJobConfig {
     return this.jobBuilderFactory.get("checkUriJob")
 //        .preventRestart()
         .validator(validator)
+        .listener(new JobReporter())
         .start(logResourceMetaStep())
         .next(checkUriStep())
         .build();

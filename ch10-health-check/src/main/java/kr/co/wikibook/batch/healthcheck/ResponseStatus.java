@@ -26,4 +26,13 @@ public class ResponseStatus {
   public long getResponseTime() {
     return responseTime;
   }
+
+  @Override
+  public String toString() {
+    return "ResponseStatus{" +
+        "uri=" + uri +
+        ", statusCode=" + statusCode +
+        ", responseTime=" + responseTime +
+        '}';
+  }
 }

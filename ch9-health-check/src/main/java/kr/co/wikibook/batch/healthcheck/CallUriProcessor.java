@@ -26,16 +26,19 @@ public class CallUriProcessor implements ItemProcessor<String, ResponseStatus> {
   public ResponseStatus process(String rawUri)
       throws IOException, InterruptedException, URISyntaxException {
 
-    logger.info("try to call {}", rawUri);
+    logger.info("호출 시도 : {}", rawUri); // <1>
     URI uri = new URI(rawUri);
     HttpRequest request = HttpRequest.newBuilder()
         .uri(uri)
         .timeout(this.requestTimeout)
         .build();
     long startTime = System.currentTimeMillis();
-    HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+    HttpResponse<String> response = this.client.send(request, BodyHandlers.ofString());
     long responseTime = System.currentTimeMillis() - startTime;
-    logger.info("{}ms", responseTime);
+    logger.info("응답 시간 : {}ms", responseTime);
+    if(response.statusCode() == 404) {
+      logger.warn("404 응답 : {}", rawUri);
+    }
     return new ResponseStatus(uri, response.statusCode(), responseTime);
   }
 }
