@@ -28,15 +28,13 @@ class EmailReporterTest {
   @Test
   void skipSendEmail() {
     // given
-    JavaMailSender mailSender = mock(JavaMailSender.class);
-
     var jobInstance = new JobInstance(0L, "testJob");
     JobExecution jobExecution = new JobExecution(0L);
     jobExecution.setJobInstance(jobInstance);
     jobExecution.setStatus(BatchStatus.COMPLETED);
 
     boolean skipOnSuccess = true;
-
+    JavaMailSender mailSender = mock(JavaMailSender.class);
     var reporter = new EmailJobReporter(mailSender, List.of(), skipOnSuccess);
 
     // when
@@ -50,7 +48,7 @@ class EmailReporterTest {
   void sendEmail() throws IOException {
     try (SimpleSmtpServer smtpServer = SimpleSmtpServer.start(SimpleSmtpServer.AUTO_SMTP_PORT)) {
       // given
-      JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+      var mailSender = new JavaMailSenderImpl();
       mailSender.setHost("localhost");
       mailSender.setPort(smtpServer.getPort());
 

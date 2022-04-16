@@ -56,7 +56,7 @@ public class EmailJobReporter extends JobExecutionListenerSupport {
   }
 
   private String toText(JobExecution jobExec) {
-    StringBuilder text = new StringBuilder();
+    var text = new StringBuilder();
     for (StepExecution stepExec : jobExec.getStepExecutions()) {
       String stepDuration = Times.getReadableDuration(
           stepExec.getStartTime().toInstant(),
