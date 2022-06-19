@@ -3,6 +3,7 @@ package kr.co.wikibook.batch.healthcheck.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
+import kr.co.wikibook.batch.healthcheck.support.Times;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

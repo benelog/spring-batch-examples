@@ -12,10 +12,6 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 @EnableBatchProcessing
 public class HealthCheckApplication {
   public static void main(String[] args) throws IOException {
-    SpringApplication.run(HealthCheckApplication.class, args)
-        .addApplicationListener(new ApplicationPidFileWriter());
-    String pid = Files.readString(Path.of("applcation.pid"));
-    System.out.println(pid);
-
+    SpringApplication.run(HealthCheckApplication.class, args);
   }
 }

@@ -28,14 +28,14 @@ public class SelectJobMetadataKeyTasklet extends StepExecutionListenerSupport im
     Map<String, Object> jobParameters = stepContext.getJobParameters();
     long daysOfKeeping = (Long)jobParameters.get("daysOfKeeping");
     Instant baseDay = minusDaysAtSeoul(Instant.now(), daysOfKeeping);
-    Long maxJobExecutionId = dao.selectMaxJobExecutionIdBefore(baseDay);
+    Long maxJobExecutionId = this.dao.selectMaxJobExecutionIdBefore(baseDay);
 
     if (maxJobExecutionId == null) {
       return RepeatStatus.FINISHED;
     }
 
-    Long maxJobInstanceId = dao.selectMaxJobInstanceId(maxJobExecutionId);
-    Long maxStepExecutionId = dao.selectMaxStepExecutionId(maxJobExecutionId);
+    Long maxJobInstanceId = this.dao.selectMaxJobInstanceId(maxJobExecutionId);
+    Long maxStepExecutionId = this.dao.selectMaxStepExecutionId(maxJobExecutionId);
 
     ExecutionContext jobExecutionContext = stepContext.getStepExecution().getJobExecution().getExecutionContext();
     jobExecutionContext.putLong("maxJobExecutionId", maxJobExecutionId);
