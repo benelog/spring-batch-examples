@@ -49,5 +49,4 @@ public class CheckDiskSpaceTasklet implements Tasklet {
         .mapToLong(file -> file.length())
         .sum();
   }
-
 }
