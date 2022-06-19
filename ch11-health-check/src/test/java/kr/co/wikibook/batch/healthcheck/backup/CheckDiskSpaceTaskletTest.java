@@ -52,7 +52,7 @@ class CheckDiskSpaceTaskletTest {
   void checkDiskSpace() throws IOException {
     // given
     Path sourceFile = this.tempPath.resolve("test.txt");
-    Files.writeString(sourceFile, "test content");
+    Files.writeString(sourceFile, "T".repeat(12)); // 12 bytes 파일
 
     File targetParentDir = mock(File.class);
     given(targetParentDir.exists()).willReturn(true);

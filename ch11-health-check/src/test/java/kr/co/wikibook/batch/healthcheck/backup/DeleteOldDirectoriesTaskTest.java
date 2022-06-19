@@ -31,9 +31,9 @@ class DeleteOldDirectoriesTaskTest {
 
     // then
     assertThat(status).isEqualTo(RepeatStatus.FINISHED);
-    assertThat(Files.exists(dir1)).isTrue();
+    assertThat(Files.exists(dir1)).isFalse();
     assertThat(Files.exists(dir2)).isTrue();
-    assertThat(Files.exists(dir3)).isFalse();
+    assertThat(Files.exists(dir3)).isTrue();
   }
 
   private Path createDirAndFile(String directoryName, String lastModifiedAt) throws IOException {
