@@ -1,7 +1,5 @@
 package kr.co.wikibook.batch.healthcheck.report;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -15,9 +13,6 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @Configuration
 public class UserRankingJobConfig {
-
-  private final Logger logger = LoggerFactory.getLogger(UserRankingJobConfig.class);
-
   private JobBuilderFactory jobBuilderFactory;
   private StepBuilderFactory stepBuilderFactory;
 
@@ -32,26 +27,26 @@ public class UserRankingJobConfig {
   @Bean
   public Job userRankingJob() {
     return this.jobBuilderFactory.get("userRankingJob")
-        .start(processLogFlow())
+        .start(processAccessLogFlow())
         .split(new SimpleAsyncTaskExecutor())
-        .add(sumPurchaseAmount())
+        .add(analyzePurchasesFlow())
         .next(buildStep("사용자 순위 기록"))
         .end()
         .build();
   }
 
   @Bean
-  public Flow processLogFlow() {
-    return new FlowBuilder<SimpleFlow>("방문 기록 분석")
+  public Flow processAccessLogFlow() {
+    return new FlowBuilder<SimpleFlow>("접근 기록 처리")
         .start(buildStep("access log 전처리"))
         .next(buildStep("access 로그 분석"))
         .build();
   }
 
   @Bean
-  public Flow sumPurchaseAmount() {
-    return new FlowBuilder<SimpleFlow>("구매액 분석")
-        .start(buildStep("기간내 구매액 합계 계산"))
+  public Flow analyzePurchasesFlow() {
+    return new FlowBuilder<SimpleFlow>("구매 내역 분석")
+        .start(buildStep("구매액 합계 계산"))
         .build();
   }
 
