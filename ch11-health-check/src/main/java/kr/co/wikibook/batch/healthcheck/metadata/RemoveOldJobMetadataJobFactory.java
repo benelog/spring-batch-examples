@@ -31,7 +31,7 @@ public class RemoveOldJobMetadataJobFactory {
   }
 
   public Job createJob(String jobName) {
-    var sqls = new MetadataSqlProvider(this.tablePrefix);
+    var sqlProvider = new MetadataSqlProvider(this.tablePrefix);
     Step selectKeyTasklet = this.buildSelectKeyTasklet(tablePrefix);
     return jobBuilderFactory.get(jobName)
         .incrementer(new RunIdIncrementer())
@@ -39,17 +39,17 @@ public class RemoveOldJobMetadataJobFactory {
         .on("EMPTY").end()// 지울 로그가 없으면 바로 종료
         .from(selectKeyTasklet)
         .next(
-            buildJdbcStep("deleteStepExecutionContext", sqls::deleteStepExecutionContext)
+            buildJdbcStep("deleteStepExecutionContext", sqlProvider::deleteStepExecutionContext)
         ).next(
-            buildJdbcStep("deleteStepExecution", sqls::deleteStepExecution)
+            buildJdbcStep("deleteStepExecution", sqlProvider::deleteStepExecution)
         ).next(
-            buildJdbcStep("deleteJobExecutionContext", sqls::deleteJobExecutionContext)
+            buildJdbcStep("deleteJobExecutionContext", sqlProvider::deleteJobExecutionContext)
         ).next(
-            buildJdbcStep("deleteJobExecutionParams", sqls::deleteJobExecutionParams)
+            buildJdbcStep("deleteJobExecutionParams", sqlProvider::deleteJobExecutionParams)
         ).next(
-            buildJdbcStep("deleteJobExecution", sqls::deleteJobExecution)
+            buildJdbcStep("deleteJobExecution", sqlProvider::deleteJobExecution)
         ).next(
-            buildJdbcStep("deleteJobInstance", sqls::deleteJobInstance)
+            buildJdbcStep("deleteJobInstance", sqlProvider::deleteJobInstance)
         ).end()
         .build();
   }
