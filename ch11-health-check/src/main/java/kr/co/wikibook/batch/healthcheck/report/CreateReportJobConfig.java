@@ -21,30 +21,30 @@ public class CreateReportJobConfig {
 
   @Bean
   public Job createReportJob() {
-    Step reportFormatDecideStep = buildReportFormatStep();
     return this.jobBuilderFactory.get("createReportJobConfig")
-        .start(reportFormatDecideStep)
+        .start(reportFormatDecideStep())
 
         .on(ReportFormat.DAILY.name())
         .to(buildStep("일간 보고서 생성"))
 
-        .from(reportFormatDecideStep)
+        .from(reportFormatDecideStep())
         .on(ReportFormat.WEEKLY.name())
         .to(buildStep("주간 보고서 생성"))
 
-        .from(reportFormatDecideStep)
+        .from(reportFormatDecideStep())
         .on(ReportFormat.MONTHLY.name())
         .stopAndRestart(buildStep("월간 보고서 생성"))
 
-        .from(reportFormatDecideStep)
+        .from(reportFormatDecideStep())
         .on("*")
         .fail()
         .end()
         .build();
   }
 
-  private Step buildReportFormatStep() {
-    return this.stepBuilderFactory.get("reportFormatStep")
+  @Bean
+  public Step reportFormatDecideStep() {
+    return this.stepBuilderFactory.get("reportFormatDecideStep")
         .tasklet(new ReportFormatDecideTasklet())
         .build();
   }

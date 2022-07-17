@@ -16,7 +16,7 @@ public class HolidayCheckTask implements Callable<RepeatStatus> {
   @Override
   public RepeatStatus call() {
     if (Dates.isHoliday(executionDay)) {
-      throw new RuntimeException(executionDay + " is holiday");
+      throw new RuntimeException(executionDay + " is a holiday");
     }
     return RepeatStatus.FINISHED;
   }
