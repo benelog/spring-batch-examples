@@ -42,13 +42,13 @@ public class SendReportJobConfig {
   @Bean
   public Step checkHolidayStep() {
     return this.stepBuilderFactory.get("checkHolidayStep")
-        .tasklet(helloLocalDateTask(null))
+        .tasklet(checkHolidayTasklet(null))
         .build();
   }
 
   @Bean
   @JobScope
-  public Tasklet helloLocalDateTask(
+  public Tasklet checkHolidayTasklet(
       @Value("#{jobParameters['reportDay']}")
       @DateTimeFormat(pattern = "yyyy-MM-dd")
       LocalDate day) {

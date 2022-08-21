@@ -3,10 +3,12 @@ package kr.co.wikibook.batch.healthcheck.metadata;
 import java.time.Instant;
 import java.util.Map;
 import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class JobMetadataDao {
-  private final NamedParameterJdbcTemplate jdbcOperations;
+  private final NamedParameterJdbcOperations jdbcOperations;
   private final MetadataSqlProvider sql;
 
   public JobMetadataDao(DataSource dataSource, String tablePrefix) {
