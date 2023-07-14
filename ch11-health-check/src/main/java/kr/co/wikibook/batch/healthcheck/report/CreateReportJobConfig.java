@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CreateReportJobConfig {
-  private JobBuilderFactory jobBuilderFactory;
-  private StepBuilderFactory stepBuilderFactory;
+  private final JobBuilderFactory jobBuilderFactory;
+  private final StepBuilderFactory stepBuilderFactory;
 
   public CreateReportJobConfig(
       JobBuilderFactory jobBuilderFactory,
@@ -21,7 +21,7 @@ public class CreateReportJobConfig {
 
   @Bean
   public Job createReportJob() {
-    return this.jobBuilderFactory.get("createReportJobConfig")
+    return this.jobBuilderFactory.get("createReportJob")
         .start(reportFormatDecideStep())
 
         .on(ReportFormat.DAILY.name())

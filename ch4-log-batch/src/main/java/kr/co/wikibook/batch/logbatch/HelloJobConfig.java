@@ -16,13 +16,16 @@ public class HelloJobConfig {
 
   public static final String JOB_NAME = "helloJob";
 
+
   @Bean
   public Job helloJob(JobBuilderFactory jobFactory, StepBuilderFactory stepFactory) {
     var noTransaction = new DefaultTransactionAttribute(Propagation.NOT_SUPPORTED.value());
+    var dummyTxManager = new ResourcelessTransactionManager();
 
     return jobFactory.get(JOB_NAME)
         .start(stepFactory.get("helloStep")
-            .tasklet(new HelloTask())
+            .tasklet(new HelloTasklet())
+            .transactionManager(new ResourcelessTransactionManager())
             .transactionAttribute(noTransaction)
             .build())
         .next(stepFactory.get("repeatStep")
